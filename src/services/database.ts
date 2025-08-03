@@ -1,0 +1,517 @@
+import { invoke } from "@tauri-apps/api/tauri";
+import {
+  Subject,
+  Entry,
+  Revision,
+  RevisionInterval,
+  Setting,
+  ActivityLog,
+  SubjectWithStats,
+  EntryWithDetails,
+  CalendarDay,
+  ActivityLogWithDetails,
+} from "../types";
+import { format, addDays, parseISO } from "date-fns";
+
+// Database wrapper functions
+async function dbExecute(sql: string, params: any[] = []): Promise<{ lastInsertId: number; rowsAffected: number }> {
+  return await invoke("db_execute", { sql, params });
+}
+
+async function dbSelect<T>(sql: string, params: any[] = []): Promise<T[]> {
+  return await invoke("db_select", { sql, params });
+}
+
+// Subject APIs
+export async function getSubjects(): Promise<SubjectWithStats[]> {
+  const subjects = await dbSelect<Subject>(
+    "SELECT * FROM subjects ORDER BY created_at DESC",
+    []
+  );
+
+  // Get entry counts and next revision for each subject
+  const subjectsWithStats = await Promise.all(
+    subjects.map(async (subject) => {
+      const entryCount = await dbSelect<{ count: number }>(
+        "SELECT COUNT(*) as count FROM entries WHERE subject_id = ?",
+        [subject.id]
+      );
+
+      const nextRevision = await dbSelect<{ due_date: string }>(
+        `SELECT due_date FROM revisions r
+         JOIN entries e ON r.entry_id = e.id
+         WHERE e.subject_id = ? AND r.status IN ('pending', 'overdue')
+         ORDER BY r.due_date ASC
+         LIMIT 1`,
+        [subject.id]
+      );
+
+      let nextRevisionDays: number | undefined;
+      if (nextRevision.length > 0) {
+        const today = new Date();
+        const dueDate = parseISO(nextRevision[0].due_date);
+        nextRevisionDays = Math.ceil(
+          (dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+        );
+      }
+
+      return {
+        ...subject,
+        entryCount: entryCount[0].count,
+        nextRevisionDays,
+      };
+    })
+  );
+
+  return subjectsWithStats;
+}
+
+export async function createSubject(name: string): Promise<Subject> {
+  const result = await dbExecute(
+    "INSERT INTO subjects (name) VALUES (?)",
+    [name]
+  );
+
+  const subjects = await dbSelect<Subject>(
+    "SELECT * FROM subjects WHERE id = ?",
+    [result.lastInsertId]
+  );
+
+  return subjects[0];
+}
+
+export async function updateSubject(
+  id: number,
+  name: string
+): Promise<Subject> {
+  await dbExecute(
+    "UPDATE subjects SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+    [name, id]
+  );
+
+  const subjects = await dbSelect<Subject>(
+    "SELECT * FROM subjects WHERE id = ?",
+    [id]
+  );
+
+  return subjects[0];
+}
+
+export async function deleteSubject(id: number): Promise<void> {
+  await dbExecute("DELETE FROM subjects WHERE id = ?", [id]);
+}
+
+export async function getSubjectById(id: number): Promise<Subject> {
+  const subjects = await dbSelect<Subject>(
+    "SELECT * FROM subjects WHERE id = ?",
+    [id]
+  );
+  return subjects[0];
+}
+
+// Entry APIs
+export async function getEntriesBySubject(
+  subjectId: number
+): Promise<EntryWithDetails[]> {
+  const entries = await dbSelect<Entry>(
+    "SELECT * FROM entries WHERE subject_id = ? ORDER BY study_date DESC",
+    [subjectId]
+  );
+
+  const subject = await getSubjectById(subjectId);
+
+  const entriesWithDetails = await Promise.all(
+    entries.map(async (entry) => {
+      const revisions = await dbSelect<Revision>(
+        "SELECT * FROM revisions WHERE entry_id = ? ORDER BY due_date ASC",
+        [entry.id]
+      );
+
+      const intervals = await dbSelect<RevisionInterval>(
+        "SELECT * FROM revision_intervals WHERE entry_id = ? ORDER BY interval_days ASC",
+        [entry.id]
+      );
+
+      return {
+        ...entry,
+        subject_name: subject.name,
+        revisions,
+        intervals,
+      };
+    })
+  );
+
+  return entriesWithDetails;
+}
+
+export async function getEntryById(id: number): Promise<EntryWithDetails> {
+  const entries = await dbSelect<Entry>(
+    "SELECT * FROM entries WHERE id = ?",
+    [id]
+  );
+
+  const entry = entries[0];
+  const subject = await getSubjectById(entry.subject_id);
+
+  const revisions = await dbSelect<Revision>(
+    "SELECT * FROM revisions WHERE entry_id = ? ORDER BY due_date ASC",
+    [entry.id]
+  );
+
+  const intervals = await dbSelect<RevisionInterval>(
+    "SELECT * FROM revision_intervals WHERE entry_id = ? ORDER BY interval_days ASC",
+    [entry.id]
+  );
+
+  return {
+    ...entry,
+    subject_name: subject.name,
+    revisions,
+    intervals,
+  };
+}
+
+export async function createEntry(
+  subjectId: number,
+  studyDate: string,
+  studyNotes: string,
+  intervals: number[]
+): Promise<EntryWithDetails> {
+  // Insert entry
+  const entryResult = await dbExecute(
+    "INSERT INTO entries (subject_id, study_date, study_notes) VALUES (?, ?, ?)",
+    [subjectId, studyDate, studyNotes]
+  );
+
+  const entryId = entryResult.lastInsertId;
+
+  // Insert intervals
+  for (const interval of intervals) {
+    await dbExecute(
+      "INSERT INTO revision_intervals (entry_id, interval_days) VALUES (?, ?)",
+      [entryId, interval]
+    );
+
+    // Calculate due date and create revision
+    const dueDate = format(
+      addDays(parseISO(studyDate), interval),
+      "yyyy-MM-dd"
+    );
+    await dbExecute(
+      "INSERT INTO revisions (entry_id, interval_days, due_date, status) VALUES (?, ?, ?, 'pending')",
+      [entryId, interval, dueDate]
+    );
+  }
+
+  // Insert activity log
+  await dbExecute(
+    "INSERT INTO activity_log (entry_id, activity_type, activity_date) VALUES (?, 'study', ?)",
+    [entryId, studyDate]
+  );
+
+  return await getEntryById(entryId);
+}
+
+export async function updateEntry(
+  id: number,
+  studyNotes: string,
+  morningRecallNotes: string | null,
+  intervals?: number[]
+): Promise<EntryWithDetails> {
+  await dbExecute(
+    "UPDATE entries SET study_notes = ?, morning_recall_notes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+    [studyNotes, morningRecallNotes, id]
+  );
+
+  // If intervals are provided, update them
+  if (intervals) {
+    const entries = await dbSelect<Entry>(
+      "SELECT * FROM entries WHERE id = ?",
+      [id]
+    );
+    const studyDate = entries[0].study_date;
+
+    // Delete existing intervals and revisions that are not completed
+    await dbExecute("DELETE FROM revision_intervals WHERE entry_id = ?", [
+      id,
+    ]);
+    await dbExecute(
+      "DELETE FROM revisions WHERE entry_id = ? AND status = 'pending'",
+      [id]
+    );
+
+    // Insert new intervals
+    for (const interval of intervals) {
+      await dbExecute(
+        "INSERT INTO revision_intervals (entry_id, interval_days) VALUES (?, ?)",
+        [id, interval]
+      );
+
+      // Calculate due date and create revision
+      const dueDate = format(
+        addDays(parseISO(studyDate), interval),
+        "yyyy-MM-dd"
+      );
+      await dbExecute(
+        "INSERT INTO revisions (entry_id, interval_days, due_date, status) VALUES (?, ?, ?, 'pending')",
+        [id, interval, dueDate]
+      );
+    }
+  }
+
+  return await getEntryById(id);
+}
+
+export async function deleteEntry(id: number): Promise<void> {
+  await dbExecute("DELETE FROM entries WHERE id = ?", [id]);
+}
+
+// Revision APIs
+export async function getRevisionsDueToday(): Promise<
+  (Revision & { entry: Entry; subject: Subject })[]
+> {
+  const today = format(new Date(), "yyyy-MM-dd");
+
+  const revisions = await dbSelect<Revision>(
+    "SELECT * FROM revisions WHERE due_date <= ? AND status IN ('pending', 'overdue') ORDER BY due_date ASC",
+    [today]
+  );
+
+  const revisionsWithDetails = await Promise.all(
+    revisions.map(async (revision) => {
+      const entry = await getEntryById(revision.entry_id);
+      const subject = await getSubjectById(entry.subject_id);
+
+      return {
+        ...revision,
+        entry: entry,
+        subject: subject,
+      };
+    })
+  );
+
+  return revisionsWithDetails;
+}
+
+export async function getRevisionsByDate(
+  date: string
+): Promise<(Revision & { entry: Entry; subject: Subject })[]> {
+  const revisions = await dbSelect<Revision>(
+    "SELECT * FROM revisions WHERE due_date = ? ORDER BY status ASC",
+    [date]
+  );
+
+  const revisionsWithDetails = await Promise.all(
+    revisions.map(async (revision) => {
+      const entry = await getEntryById(revision.entry_id);
+      const subject = await getSubjectById(entry.subject_id);
+
+      return {
+        ...revision,
+        entry: entry,
+        subject: subject,
+      };
+    })
+  );
+
+  return revisionsWithDetails;
+}
+
+export async function completeRevision(id: number): Promise<void> {
+  await dbExecute(
+    "UPDATE revisions SET status = 'completed', completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+    [id]
+  );
+
+  // Get the revision to log activity
+  const revisions = await dbSelect<Revision>(
+    "SELECT * FROM revisions WHERE id = ?",
+    [id]
+  );
+  const revision = revisions[0];
+
+  await dbExecute(
+    "INSERT INTO activity_log (entry_id, activity_type, activity_date, details) VALUES (?, 'revision_completed', DATE('now'), ?)",
+    [revision.entry_id, `Day ${revision.interval_days} revision`]
+  );
+}
+
+export async function uncompleteRevision(id: number): Promise<void> {
+  const revisions = await dbSelect<Revision>(
+    "SELECT * FROM revisions WHERE id = ?",
+    [id]
+  );
+  const revision = revisions[0];
+
+  const today = format(new Date(), "yyyy-MM-dd");
+  const status = revision.due_date < today ? "overdue" : "pending";
+
+  await dbExecute(
+    "UPDATE revisions SET status = ?, completed_at = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+    [status, id]
+  );
+}
+
+export async function rescheduleRevision(
+  id: number,
+  newDate: string
+): Promise<void> {
+  // Mark old revision as rescheduled
+  await dbExecute(
+    "UPDATE revisions SET status = 'rescheduled', updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+    [id]
+  );
+
+  // Get the revision details
+  const revisions = await dbSelect<Revision>(
+    "SELECT * FROM revisions WHERE id = ?",
+    [id]
+  );
+  const revision = revisions[0];
+
+  // Create new revision with new date
+  await dbExecute(
+    "INSERT INTO revisions (entry_id, interval_days, due_date, status) VALUES (?, ?, ?, 'pending')",
+    [revision.entry_id, revision.interval_days, newDate]
+  );
+}
+
+// Calendar APIs
+export async function getCalendarData(
+  month: number,
+  year: number
+): Promise<CalendarDay[]> {
+  const startDate = format(new Date(year, month - 1, 1), "yyyy-MM-dd");
+  const endDate = format(new Date(year, month, 0), "yyyy-MM-dd");
+
+  const revisions = await dbSelect<Revision>(
+    "SELECT * FROM revisions WHERE due_date >= ? AND due_date <= ? ORDER BY due_date ASC",
+    [startDate, endDate]
+  );
+
+  // Group revisions by date
+  const revisionsByDate: Record<string, Revision[]> = {};
+  revisions.forEach((revision) => {
+    if (!revisionsByDate[revision.due_date]) {
+      revisionsByDate[revision.due_date] = [];
+    }
+    revisionsByDate[revision.due_date].push(revision);
+  });
+
+  // Create calendar days
+  const calendarDays: CalendarDay[] = [];
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = format(new Date(year, month - 1, day), "yyyy-MM-dd");
+    const dayRevisions = revisionsByDate[date] || [];
+
+    let status: CalendarDay["status"] = "none";
+    const today = format(new Date(), "yyyy-MM-dd");
+
+    if (dayRevisions.length > 0) {
+      if (dayRevisions.some((r) => r.status === "overdue")) {
+        status = "overdue";
+      } else if (
+        dayRevisions.some((r) => r.status === "pending") &&
+        date <= today
+      ) {
+        status = "due";
+      } else if (dayRevisions.every((r) => r.status === "completed")) {
+        status = "completed";
+      } else {
+        status = "future";
+      }
+    }
+
+    calendarDays.push({
+      date,
+      revisions: dayRevisions,
+      status,
+    });
+  }
+
+  return calendarDays;
+}
+
+// History APIs
+export async function getActivityLog(filters?: {
+  subjectId?: number;
+  startDate?: string;
+  endDate?: string;
+  activityType?: string;
+}): Promise<ActivityLogWithDetails[]> {
+  let query = "SELECT * FROM activity_log WHERE 1=1";
+  const params: any[] = [];
+
+  if (filters?.activityType) {
+    query += " AND activity_type = ?";
+    params.push(filters.activityType);
+  }
+
+  if (filters?.startDate) {
+    query += " AND activity_date >= ?";
+    params.push(filters.startDate);
+  }
+
+  if (filters?.endDate) {
+    query += " AND activity_date <= ?";
+    params.push(filters.endDate);
+  }
+
+  query += " ORDER BY activity_date DESC, created_at DESC";
+
+  const activities = await dbSelect<ActivityLog>(query, params);
+
+  const activitiesWithDetails = await Promise.all(
+    activities.map(async (activity) => {
+      const entry = await getEntryById(activity.entry_id);
+      const subject = await getSubjectById(entry.subject_id);
+
+      // Filter by subject if provided
+      if (filters?.subjectId && subject.id !== filters.subjectId) {
+        return null;
+      }
+
+      return {
+        ...activity,
+        entry,
+        subject,
+      };
+    })
+  );
+
+  return activitiesWithDetails.filter(
+    (a) => a !== null
+  ) as ActivityLogWithDetails[];
+}
+
+// Settings APIs
+export async function getSettings(): Promise<Record<string, string>> {
+  const settings = await dbSelect<Setting>("SELECT * FROM settings", []);
+
+  return settings.reduce(
+    (acc, setting) => {
+      acc[setting.key] = setting.value;
+      return acc;
+    },
+    {} as Record<string, string>
+  );
+}
+
+export async function updateSetting(key: string, value: string): Promise<void> {
+  await dbExecute(
+    "INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)",
+    [key, value]
+  );
+}
+
+// Update overdue revisions
+export async function updateOverdueRevisions(): Promise<void> {
+  const today = format(new Date(), "yyyy-MM-dd");
+
+  await dbExecute(
+    "UPDATE revisions SET status = 'overdue' WHERE due_date < ? AND status = 'pending'",
+    [today]
+  );
+}
