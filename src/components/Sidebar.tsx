@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, VStack, Text, Icon, HStack, Badge } from "@chakra-ui/react";
+import { Box, VStack, Text, HStack } from "@chakra-ui/react";
 import { Link, useLocation } from "react-router-dom";
 import { getRevisionsDueToday } from "../services/database";
 
