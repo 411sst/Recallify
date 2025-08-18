@@ -213,7 +213,7 @@ fn db_select(sql: String, params: Vec<serde_json::Value>) -> Result<Vec<serde_js
 
 fn main() {
     // Initialize database at startup
-    let _ = DB.lock();
+    drop(DB.lock());
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![db_execute, db_select])
