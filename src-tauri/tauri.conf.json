@@ -24,7 +24,10 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.recallify.app"
+      "identifier": "com.recallify.app",
+      "icon": [
+        "icons/icon.ico"
+      ]
     },
     "security": {
       "csp": null

@@ -4,6 +4,7 @@ import { Box } from "@chakra-ui/react";
 import Sidebar from "./components/Sidebar";
 import SubjectsPage from "./pages/SubjectsPage";
 import SubjectDetailPage from "./pages/SubjectDetailPage";
+import PomodoroPage from "./pages/PomodoroPage";
 import CalendarPage from "./pages/CalendarPage";
 import HistoryPage from "./pages/HistoryPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -29,6 +30,7 @@ function App() {
         <Routes>
           <Route path="/" element={<SubjectsPage />} />
           <Route path="/subjects/:id" element={<SubjectDetailPage />} />
+          <Route path="/pomodoro" element={<PomodoroPage />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/settings" element={<SettingsPage />} />

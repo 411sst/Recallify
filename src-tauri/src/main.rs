@@ -67,6 +67,24 @@ fn init_database(conn: &Connection) -> Result<()> {
             FOREIGN KEY (entry_id) REFERENCES entries(id) ON DELETE CASCADE
         );
 
+        CREATE TABLE IF NOT EXISTS pomodoro_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_type TEXT NOT NULL CHECK(session_type IN ('work', 'short_break', 'long_break')),
+            duration_minutes INTEGER NOT NULL,
+            completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS pomodoro_state (
+            id INTEGER PRIMARY KEY CHECK(id = 1),
+            session_type TEXT NOT NULL CHECK(session_type IN ('work', 'short_break', 'long_break')),
+            start_timestamp INTEGER,
+            duration_seconds INTEGER NOT NULL,
+            remaining_seconds INTEGER NOT NULL,
+            is_running INTEGER DEFAULT 0,
+            pomodoro_count INTEGER DEFAULT 0 CHECK(pomodoro_count >= 0 AND pomodoro_count <= 4),
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
         CREATE INDEX IF NOT EXISTS idx_entries_subject_id ON entries(subject_id);
         CREATE INDEX IF NOT EXISTS idx_entries_study_date ON entries(study_date);
         CREATE INDEX IF NOT EXISTS idx_revisions_entry_id ON revisions(entry_id);
@@ -74,6 +92,7 @@ fn init_database(conn: &Connection) -> Result<()> {
         CREATE INDEX IF NOT EXISTS idx_revisions_status ON revisions(status);
         CREATE INDEX IF NOT EXISTS idx_activity_log_entry_id ON activity_log(entry_id);
         CREATE INDEX IF NOT EXISTS idx_activity_log_activity_date ON activity_log(activity_date);
+        CREATE INDEX IF NOT EXISTS idx_pomodoro_sessions_completed_at ON pomodoro_sessions(completed_at);
         ",
     )?;
 
@@ -88,6 +107,40 @@ fn init_database(conn: &Connection) -> Result<()> {
     )?;
     conn.execute(
         "INSERT OR IGNORE INTO settings (key, value) VALUES ('notification_time', '10:00')",
+        [],
+    )?;
+
+    // Pomodoro settings
+    conn.execute(
+        "INSERT OR IGNORE INTO settings (key, value) VALUES ('pomodoro_work_duration', '25')",
+        [],
+    )?;
+    conn.execute(
+        "INSERT OR IGNORE INTO settings (key, value) VALUES ('pomodoro_short_break', '5')",
+        [],
+    )?;
+    conn.execute(
+        "INSERT OR IGNORE INTO settings (key, value) VALUES ('pomodoro_long_break_default', '20')",
+        [],
+    )?;
+    conn.execute(
+        "INSERT OR IGNORE INTO settings (key, value) VALUES ('pomodoro_sound_enabled', 'true')",
+        [],
+    )?;
+    conn.execute(
+        "INSERT OR IGNORE INTO settings (key, value) VALUES ('pomodoro_sound_choice', 'gentle_bell')",
+        [],
+    )?;
+
+    // Dark mode setting
+    conn.execute(
+        "INSERT OR IGNORE INTO settings (key, value) VALUES ('dark_mode_enabled', 'false')",
+        [],
+    )?;
+
+    // Initialize pomodoro state
+    conn.execute(
+        "INSERT OR IGNORE INTO pomodoro_state (id, session_type, duration_seconds, remaining_seconds, pomodoro_count) VALUES (1, 'work', 1500, 1500, 0)",
         [],
     )?;
 
