@@ -75,6 +75,8 @@ export interface PomodoroSession {
   id: number;
   session_type: "work" | "short_break" | "long_break";
   duration_minutes: number;
+  subject_id: number | null;
+  syllabus_item_id: number | null;
   completed_at: string;
 }
 
@@ -87,4 +89,66 @@ export interface PomodoroState {
   is_running: number;
   pomodoro_count: number;
   updated_at: string;
+}
+
+// Syllabus types
+export interface SyllabusItem {
+  id: number;
+  subject_id: number;
+  parent_id: number | null;
+  title: string;
+  description: string | null;
+  estimated_hours: number | null;
+  due_date: string | null;
+  is_completed: number;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SyllabusItemWithChildren extends SyllabusItem {
+  children: SyllabusItemWithChildren[];
+  entry_count: number;
+  completed_count: number;
+  progress_percentage: number;
+}
+
+export interface EntrySyllabusLink {
+  entry_id: number;
+  syllabus_item_id: number;
+  created_at: string;
+}
+
+// PDF types
+export interface PdfAttachment {
+  id: number;
+  entry_id: number;
+  file_name: string;
+  file_path: string;
+  file_size: number;
+  page_count: number | null;
+  last_viewed_page: number;
+  created_at: string;
+}
+
+// Export types
+export interface ExportHistory {
+  id: number;
+  export_type: string;
+  file_name: string;
+  file_path: string;
+  file_size: number | null;
+  exported_at: string;
+}
+
+export interface ExportOptions {
+  format: "pdf" | "markdown" | "html" | "json";
+  includeNotes: boolean;
+  includeMorningRecall: boolean;
+  includeRevisions: boolean;
+  includePdfs: boolean;
+  includeImages: boolean;
+  includeStudyTime: boolean;
+  includeSyllabus: boolean;
+  template?: "academic" | "minimal" | "detailed";
 }
