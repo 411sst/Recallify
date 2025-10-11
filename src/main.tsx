@@ -9,12 +9,12 @@ import "./styles/global.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <ChakraProvider theme={theme}>
+    <ChakraProvider theme={theme}>
+      <ThemeProvider>
         <BrowserRouter>
           <App />
         </BrowserRouter>
-      </ChakraProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </ChakraProvider>
   </React.StrictMode>
 );

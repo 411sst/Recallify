@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect } from "react";
+import { useColorMode } from "@chakra-ui/react";
 import { getSettings, updateSetting } from "../services/database";
 
 interface ThemeContextType {
@@ -9,7 +10,8 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { colorMode, setColorMode } = useColorMode();
+  const isDarkMode = colorMode === "dark";
 
   useEffect(() => {
     loadTheme();
@@ -19,29 +21,19 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       const settings = await getSettings();
       const darkModeEnabled = settings.dark_mode_enabled === "true";
-      setIsDarkMode(darkModeEnabled);
-      applyTheme(darkModeEnabled);
+      setColorMode(darkModeEnabled ? "dark" : "light");
     } catch (error) {
       console.error("Error loading theme:", error);
     }
   }
 
   async function toggleTheme() {
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
-    applyTheme(newMode);
+    const newMode = colorMode === "light" ? "dark" : "light";
+    setColorMode(newMode);
     try {
-      await updateSetting("dark_mode_enabled", String(newMode));
+      await updateSetting("dark_mode_enabled", String(newMode === "dark"));
     } catch (error) {
       console.error("Error saving theme:", error);
-    }
-  }
-
-  function applyTheme(darkMode: boolean) {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
     }
   }
 

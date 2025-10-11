@@ -17,7 +17,6 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  Input,
 } from "@chakra-ui/react";
 import { invoke } from "@tauri-apps/api/tauri";
 import { open } from "@tauri-apps/api/dialog";
