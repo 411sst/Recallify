@@ -22,6 +22,7 @@ import {
   FormLabel,
   useToast,
   Spinner,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { getSubjects, createSubject } from "../services/database";
@@ -34,6 +35,12 @@ export default function SubjectsPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const navigate = useNavigate();
+
+  // Dark mode colors
+  const textColor = useColorModeValue("#0A122A", "#ffffff");
+  const tertiaryTextColor = useColorModeValue("#6B6B6B", "#b0b0b0");
+  const emptyStateBg = useColorModeValue("white", "#1a1a1a");
+  const emptyStateBorder = useColorModeValue("gray.200", "#333333");
 
   useEffect(() => {
     loadSubjects();
@@ -102,7 +109,7 @@ export default function SubjectsPage() {
   return (
     <Box>
       <HStack justify="space-between" mb={8}>
-        <Heading size="xl" color="text.primary">
+        <Heading size="xl" color={textColor}>
           My Subjects
         </Heading>
         <Button onClick={onOpen} size="lg">
@@ -115,12 +122,12 @@ export default function SubjectsPage() {
           textAlign="center"
           py={16}
           px={4}
-          bg="white"
+          bg={emptyStateBg}
           borderRadius="md"
           border="2px dashed"
-          borderColor="gray.200"
+          borderColor={emptyStateBorder}
         >
-          <Text fontSize="lg" color="text.tertiary" mb={4}>
+          <Text fontSize="lg" color={tertiaryTextColor} mb={4}>
             No subjects yet. Create your first subject to get started!
           </Text>
           <Button onClick={onOpen}>Create Subject</Button>
@@ -140,10 +147,10 @@ export default function SubjectsPage() {
             >
               <CardBody>
                 <VStack align="start" spacing={3}>
-                  <Heading size="md" color="text.primary">
+                  <Heading size="md" color={textColor}>
                     {subject.name}
                   </Heading>
-                  <Text color="text.tertiary" fontSize="sm">
+                  <Text color={tertiaryTextColor} fontSize="sm">
                     {subject.entryCount} note{subject.entryCount !== 1 ? "s" : ""}
                   </Text>
                   {subject.nextRevisionDays !== undefined && (

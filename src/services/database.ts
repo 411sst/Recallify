@@ -175,12 +175,13 @@ export async function createEntry(
   subjectId: number,
   studyDate: string,
   studyNotes: string,
-  intervals: number[]
+  intervals: number[],
+  topics?: string
 ): Promise<EntryWithDetails> {
   // Insert entry
   const entryResult = await dbExecute(
-    "INSERT INTO entries (subject_id, study_date, study_notes) VALUES (?, ?, ?)",
-    [subjectId, studyDate, studyNotes]
+    "INSERT INTO entries (subject_id, study_date, study_notes, topics) VALUES (?, ?, ?, ?)",
+    [subjectId, studyDate, studyNotes, topics || null]
   );
 
   const entryId = entryResult.lastInsertId;
@@ -216,11 +217,12 @@ export async function updateEntry(
   id: number,
   studyNotes: string,
   morningRecallNotes: string | null,
-  intervals?: number[]
+  intervals?: number[],
+  topics?: string
 ): Promise<EntryWithDetails> {
   await dbExecute(
-    "UPDATE entries SET study_notes = ?, morning_recall_notes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-    [studyNotes, morningRecallNotes, id]
+    "UPDATE entries SET study_notes = ?, morning_recall_notes = ?, topics = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+    [studyNotes, morningRecallNotes, topics || null, id]
   );
 
   // If intervals are provided, update them

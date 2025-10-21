@@ -73,6 +73,7 @@ export default function SubjectDetailPage() {
 
   // Form state
   const [studyDate, setStudyDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [topics, setTopics] = useState("");
   const [studyNotes, setStudyNotes] = useState("");
   const [morningRecallNotes, setMorningRecallNotes] = useState("");
   const [intervals, setIntervals] = useState<number[]>([3, 7]);
@@ -130,6 +131,7 @@ export default function SubjectDetailPage() {
     setSelectedEntry(null);
     setIsEditing(false);
     setStudyDate(format(new Date(), "yyyy-MM-dd"));
+    setTopics("");
     setStudyNotes("");
     setMorningRecallNotes("");
     // Reset to default intervals
@@ -145,6 +147,7 @@ export default function SubjectDetailPage() {
     setSelectedEntry(entry);
     setIsEditing(true);
     setStudyDate(entry.study_date);
+    setTopics((entry as any).topics || "");
     setStudyNotes(entry.study_notes);
     setMorningRecallNotes(entry.morning_recall_notes || "");
     setIntervals(entry.intervals.map((i) => i.interval_days));
@@ -176,7 +179,8 @@ export default function SubjectDetailPage() {
           selectedEntry.id,
           studyNotes,
           morningRecallNotes || null,
-          intervals
+          intervals,
+          topics
         );
         toast({
           title: "Entry updated",
@@ -184,7 +188,7 @@ export default function SubjectDetailPage() {
           duration: 3000,
         });
       } else {
-        await createEntry(Number(id), studyDate, studyNotes, intervals);
+        await createEntry(Number(id), studyDate, studyNotes, intervals, topics);
         toast({
           title: "Entry created",
           status: "success",
@@ -484,9 +488,15 @@ export default function SubjectDetailPage() {
                           })}
                         </HStack>
                       </HStack>
-                      <Text color="text.secondary" noOfLines={2}>
-                        {getPreviewText(entry.study_notes, 200)}
-                      </Text>
+                      {(entry as any).topics ? (
+                        <Text color="text.secondary" noOfLines={2} fontWeight="medium">
+                          Topics: {(entry as any).topics}
+                        </Text>
+                      ) : (
+                        <Text color="text.tertiary" noOfLines={2} fontSize="sm" fontStyle="italic">
+                          No topics specified
+                        </Text>
+                      )}
                       {entry.morning_recall_notes && (
                         <Text
                           mt={2}
@@ -604,6 +614,18 @@ export default function SubjectDetailPage() {
                   onChange={(e) => setStudyDate(e.target.value)}
                   isDisabled={isEditing}
                 />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel>Topics Covered *</FormLabel>
+                <Input
+                  placeholder="Arrays, Two Pointers, Sliding Window"
+                  value={topics}
+                  onChange={(e) => setTopics(e.target.value)}
+                />
+                <Text fontSize="xs" color="text.tertiary" mt={1}>
+                  💡 Enter topics separated by commas or line breaks
+                </Text>
               </FormControl>
 
               <FormControl>
