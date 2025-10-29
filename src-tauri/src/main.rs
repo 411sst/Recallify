@@ -2,8 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use once_cell::sync::Lazy;
-use rusqlite::{Connection, Result, params_from_iter};
-use serde::{Deserialize, Serialize};
+use rusqlite::{Connection, Result};
 use std::sync::Mutex;
 
 static DB: Lazy<Mutex<Connection>> = Lazy::new(|| {
