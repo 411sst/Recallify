@@ -124,26 +124,11 @@ Introduction to ML: Machine Learning and its Models, Concept Learning: Concepts 
 
 ---
 
-## 🚧 IN PROGRESS FEATURES
-
-### 4. Dependencies Installation
-**Status:** ⏳ Ready (package.json updated)
-
-NPM packages added for remaining features:
-- TipTap (Rich Text Editor): `@tiptap/react`, `@tiptap/starter-kit`, extensions
-- PDF.js: `pdfjs-dist`, `react-pdf`
-- Export: `jspdf`, `html2canvas`
-
-**Action Required:** Run `npm install` before building
-
----
-
-## 📋 PENDING FEATURES
-
-### 5. Rich Text Editor (TipTap Integration)
-**Status:** ❌ Not Started
+### 4. Rich Text Editor (TipTap Integration)
+**Status:** ✅ Fully Implemented
 **Priority:** P0 (Must Have)
-**Estimated Time:** 2 weeks
+
+#### Implemented Functionality:
 
 **Planned Functionality:**
 - Replace plain text fields with TipTap editor

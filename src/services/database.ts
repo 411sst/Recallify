@@ -681,3 +681,88 @@ export async function getEntrySyllabusLinks(entryId: number): Promise<any[]> {
     [entryId]
   );
 }
+
+// PDF Management APIs
+export async function getPdfAttachments(entryId: number): Promise<any[]> {
+  return await dbSelect<any>(
+    "SELECT * FROM pdf_attachments WHERE entry_id = ? ORDER BY created_at DESC",
+    [entryId]
+  );
+}
+
+export async function createPdfAttachment(data: {
+  entry_id: number;
+  file_name: string;
+  file_path: string;
+  file_size: number;
+  page_count: number | null;
+}): Promise<{ lastInsertId: number; rowsAffected: number }> {
+  return await dbExecute(
+    `INSERT INTO pdf_attachments (entry_id, file_name, file_path, file_size, page_count)
+     VALUES (?, ?, ?, ?, ?)`,
+    [data.entry_id, data.file_name, data.file_path, data.file_size, data.page_count]
+  );
+}
+
+export async function updatePdfLastViewedPage(pdfId: number, pageNumber: number): Promise<void> {
+  await dbExecute(
+    "UPDATE pdf_attachments SET last_viewed_page = ? WHERE id = ?",
+    [pageNumber, pdfId]
+  );
+}
+
+export async function deletePdfAttachment(pdfId: number): Promise<void> {
+  await dbExecute("DELETE FROM pdf_attachments WHERE id = ?", [pdfId]);
+}
+
+export async function getPdfById(pdfId: number): Promise<any | null> {
+  const result = await dbSelect<any>(
+    "SELECT * FROM pdf_attachments WHERE id = ?",
+    [pdfId]
+  );
+  return result.length > 0 ? result[0] : null;
+}
+
+// Study Session Analytics APIs
+export async function recordPomodoroSession(data: {
+  session_type: "work" | "short_break" | "long_break";
+  duration_minutes: number;
+  subject_id: number | null;
+  syllabus_item_id: number | null;
+}): Promise<void> {
+  await dbExecute(
+    `INSERT INTO pomodoro_sessions (session_type, duration_minutes, subject_id, syllabus_item_id)
+     VALUES (?, ?, ?, ?)`,
+    [data.session_type, data.duration_minutes, data.subject_id, data.syllabus_item_id]
+  );
+}
+
+export async function getStudyTimeBySubject(subjectId: number, days: number = 7): Promise<any> {
+  const result = await dbSelect<any>(
+    `SELECT
+      COUNT(*) as session_count,
+      SUM(duration_minutes) as total_minutes
+     FROM pomodoro_sessions
+     WHERE subject_id = ?
+     AND session_type = 'work'
+     AND completed_at >= datetime('now', '-${days} days')`,
+    [subjectId]
+  );
+  return result[0];
+}
+
+export async function getAllSubjectsStudyTime(days: number = 7): Promise<any[]> {
+  return await dbSelect<any>(
+    `SELECT
+      s.id,
+      s.name,
+      COUNT(ps.id) as session_count,
+      COALESCE(SUM(ps.duration_minutes), 0) as total_minutes
+     FROM subjects s
+     LEFT JOIN pomodoro_sessions ps ON s.id = ps.subject_id AND ps.session_type = 'work'
+       AND ps.completed_at >= datetime('now', '-${days} days')
+     GROUP BY s.id, s.name
+     ORDER BY total_minutes DESC`,
+    []
+  );
+}

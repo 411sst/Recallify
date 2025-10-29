@@ -319,12 +319,58 @@ fn db_select(sql: String, params: Vec<serde_json::Value>) -> Result<Vec<serde_js
     Ok(rows)
 }
 
+#[tauri::command]
+fn read_pdf_file(file_path: String) -> Result<Vec<u8>, String> {
+    std::fs::read(&file_path).map_err(|e| format!("Failed to read PDF file: {}", e))
+}
+
+#[tauri::command]
+fn save_pdf_file(file_name: String, file_data: Vec<u8>) -> Result<String, String> {
+    use std::fs;
+    use std::path::PathBuf;
+
+    // Create pdfs directory in app data folder
+    let app_dir = std::env::current_dir()
+        .map_err(|e| format!("Failed to get current directory: {}", e))?;
+
+    let pdfs_dir = app_dir.join("pdfs");
+
+    // Create directory if it doesn't exist
+    fs::create_dir_all(&pdfs_dir)
+        .map_err(|e| format!("Failed to create pdfs directory: {}", e))?;
+
+    // Generate unique file path
+    let file_path = pdfs_dir.join(&file_name);
+
+    // Write file
+    fs::write(&file_path, file_data)
+        .map_err(|e| format!("Failed to write PDF file: {}", e))?;
+
+    // Return absolute path
+    file_path
+        .to_str()
+        .ok_or_else(|| "Failed to convert path to string".to_string())
+        .map(|s| s.to_string())
+}
+
+#[tauri::command]
+fn delete_pdf_file(file_path: String) -> Result<(), String> {
+    std::fs::remove_file(&file_path)
+        .map_err(|e| format!("Failed to delete PDF file: {}", e))
+}
+
 fn main() {
     // Initialize database at startup
     drop(DB.lock());
 
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![db_execute, db_select])
+        .invoke_handler(tauri::generate_handler![
+            db_execute,
+            db_select,
+            read_pdf_file,
+            save_pdf_file,
+            delete_pdf_file
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

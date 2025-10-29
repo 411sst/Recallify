@@ -55,6 +55,9 @@ import {
 import { Subject, EntryWithDetails } from "../types";
 import { useRef } from "react";
 import SyllabusTab from "../components/SyllabusTab";
+import RichTextEditor from "../components/RichTextEditor";
+import PdfManager from "../components/PdfManager";
+import { getPreviewText } from "../utils/richTextUtils";
 
 export default function SubjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -483,7 +486,7 @@ export default function SubjectDetailPage() {
                         </HStack>
                       </HStack>
                       <Text color="text.secondary" noOfLines={2}>
-                        {entry.study_notes}
+                        {getPreviewText(entry.study_notes, 200)}
                       </Text>
                       {entry.morning_recall_notes && (
                         <Text
@@ -492,7 +495,7 @@ export default function SubjectDetailPage() {
                           color="text.tertiary"
                           fontStyle="italic"
                         >
-                          Morning recall: {entry.morning_recall_notes.substring(0, 100)}...
+                          Morning recall: {getPreviewText(entry.morning_recall_notes, 100)}
                         </Text>
                       )}
                     </CardBody>
@@ -544,8 +547,7 @@ export default function SubjectDetailPage() {
                             </Badge>
                           </HStack>
                           <Text color="text.secondary">
-                            {revision.entry.study_notes.substring(0, 200)}
-                            {revision.entry.study_notes.length > 200 ? "..." : ""}
+                            {getPreviewText(revision.entry.study_notes, 200)}
                           </Text>
                           {revision.entry.morning_recall_notes && (
                             <Box
@@ -559,7 +561,7 @@ export default function SubjectDetailPage() {
                                 Morning Recall Notes:
                               </Text>
                               <Text fontSize="sm" color="text.tertiary">
-                                {revision.entry.morning_recall_notes}
+                                {getPreviewText(revision.entry.morning_recall_notes, 300)}
                               </Text>
                             </Box>
                           )}
@@ -586,9 +588,9 @@ export default function SubjectDetailPage() {
       </Tabs>
 
       {/* Entry Modal */}
-      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="6xl">
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent maxH="90vh" overflowY="auto">
           <ModalHeader>
             {isEditing ? "Edit Entry" : "New Study Entry"}
           </ModalHeader>
@@ -607,22 +609,21 @@ export default function SubjectDetailPage() {
 
               <FormControl>
                 <FormLabel>What I Studied Today</FormLabel>
-                <Textarea
-                  placeholder="Describe what you studied..."
-                  value={studyNotes}
-                  onChange={(e) => setStudyNotes(e.target.value)}
-                  rows={6}
+                <RichTextEditor
+                  content={studyNotes}
+                  onChange={setStudyNotes}
+                  placeholder="Describe what you studied... (Press '/' for formatting options)"
+                  minHeight="300px"
                 />
               </FormControl>
 
               <FormControl>
                 <FormLabel>Morning Recall Notes (Optional)</FormLabel>
-                <Textarea
+                <RichTextEditor
+                  content={morningRecallNotes}
+                  onChange={setMorningRecallNotes}
                   placeholder="What couldn't you recall this morning?"
-                  value={morningRecallNotes}
-                  onChange={(e) => setMorningRecallNotes(e.target.value)}
-                  rows={4}
-                  bg="gray.50"
+                  minHeight="200px"
                 />
               </FormControl>
 
@@ -656,6 +657,15 @@ export default function SubjectDetailPage() {
                   ))}
                 </HStack>
               </FormControl>
+
+              {isEditing && selectedEntry && (
+                <Box pt={4} borderTop="1px solid" borderColor="gray.200">
+                  <PdfManager
+                    entryId={selectedEntry.id}
+                    onUpdate={loadSubjectData}
+                  />
+                </Box>
+              )}
             </VStack>
           </ModalBody>
           <ModalFooter>
