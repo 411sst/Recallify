@@ -1,6 +1,12 @@
-import { extendTheme } from "@chakra-ui/react";
+import { extendTheme, type ThemeConfig } from "@chakra-ui/react";
+
+const config: ThemeConfig = {
+  initialColorMode: 'light',
+  useSystemColorMode: false,
+}
 
 const theme = extendTheme({
+  config,
   colors: {
     primary: {
       50: "#e6f3e7",
@@ -48,13 +54,13 @@ const theme = extendTheme({
     "2xl": "32px",
   },
   styles: {
-    global: {
+    global: (props: any) => ({
       body: {
-        bg: "background.main",
-        color: "text.secondary",
+        bg: props.colorMode === 'dark' ? '#0A122A' : 'background.main',
+        color: props.colorMode === 'dark' ? '#FBFFF1' : 'text.secondary',
         fontSize: "sm",
       },
-    },
+    }),
   },
   components: {
     Button: {
@@ -81,16 +87,20 @@ const theme = extendTheme({
       },
     },
     Card: {
-      baseStyle: {
+      baseStyle: (props: any) => ({
         container: {
-          bg: "background.card",
+          bg: props.colorMode === 'dark' ? '#2F2F2F' : 'background.card',
           borderRadius: "8px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+          boxShadow: props.colorMode === 'dark'
+            ? "0 1px 3px rgba(255,255,255,0.1)"
+            : "0 1px 3px rgba(0,0,0,0.1)",
           _hover: {
-            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            boxShadow: props.colorMode === 'dark'
+              ? "0 4px 6px rgba(255,255,255,0.1)"
+              : "0 4px 6px rgba(0,0,0,0.1)",
           },
         },
-      },
+      }),
     },
     Input: {
       defaultProps: {
