@@ -17,13 +17,10 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  Tooltip,
 } from "@chakra-ui/react";
 import { Subject, SyllabusItemWithChildren } from "../types";
 import {
   getSyllabusItems,
-  createSyllabusItem,
-  updateSyllabusItem,
   deleteSyllabusItem,
   toggleSyllabusCompletion,
 } from "../services/database";
@@ -37,7 +34,6 @@ interface SyllabusTabProps {
 
 export default function SyllabusTab({ subject, onUpdate }: SyllabusTabProps) {
   const [syllabusItems, setSyllabusItems] = useState<SyllabusItemWithChildren[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<SyllabusItemWithChildren | null>(null);
 
   const { isOpen: isAddOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
@@ -50,7 +46,6 @@ export default function SyllabusTab({ subject, onUpdate }: SyllabusTabProps) {
 
   async function loadSyllabus() {
     try {
-      setLoading(true);
       const items = await getSyllabusItems(subject.id);
       setSyllabusItems(items);
     } catch (error) {
@@ -60,8 +55,6 @@ export default function SyllabusTab({ subject, onUpdate }: SyllabusTabProps) {
         status: "error",
         duration: 5000,
       });
-    } finally {
-      setLoading(false);
     }
   }
 
