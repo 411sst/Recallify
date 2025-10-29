@@ -515,3 +515,169 @@ export async function updateOverdueRevisions(): Promise<void> {
     [today]
   );
 }
+
+// Syllabus Management APIs
+export async function getSyllabusItems(subjectId: number): Promise<any[]> {
+  const items = await dbSelect<any>(
+    `SELECT s.*,
+      (SELECT COUNT(*) FROM entry_syllabus_links WHERE syllabus_item_id = s.id) as entry_count
+     FROM syllabus_items s
+     WHERE s.subject_id = ?
+     ORDER BY s.sort_order, s.created_at`,
+    [subjectId]
+  );
+
+  // Build tree structure
+  const itemMap = new Map();
+  const rootItems: any[] = [];
+
+  // First pass: create map of all items
+  items.forEach(item => {
+    itemMap.set(item.id, {
+      ...item,
+      children: [],
+      entry_count: item.entry_count || 0,
+      completed_count: 0,
+      progress_percentage: 0,
+    });
+  });
+
+  // Second pass: build tree and calculate progress
+  items.forEach(item => {
+    const node = itemMap.get(item.id);
+    if (item.parent_id === null) {
+      rootItems.push(node);
+    } else {
+      const parent = itemMap.get(item.parent_id);
+      if (parent) {
+        parent.children.push(node);
+      }
+    }
+  });
+
+  // Third pass: calculate progress recursively
+  function calculateProgress(node: any): { total: number; completed: number } {
+    let total = 1;
+    let completed = node.is_completed === 1 ? 1 : 0;
+
+    if (node.children.length > 0) {
+      node.children.forEach((child: any) => {
+        const childProgress = calculateProgress(child);
+        total += childProgress.total;
+        completed += childProgress.completed;
+      });
+    }
+
+    node.completed_count = completed;
+    node.progress_percentage = total > 0 ? (completed / total) * 100 : 0;
+
+    return { total, completed };
+  }
+
+  rootItems.forEach(root => calculateProgress(root));
+
+  return rootItems;
+}
+
+export async function createSyllabusItem(data: {
+  subject_id: number;
+  parent_id: number | null;
+  title: string;
+  description: string | null;
+  estimated_hours: number | null;
+  due_date: string | null;
+  sort_order?: number;
+}): Promise<{ lastInsertId: number; rowsAffected: number }> {
+  return await dbExecute(
+    `INSERT INTO syllabus_items
+     (subject_id, parent_id, title, description, estimated_hours, due_date, sort_order)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [
+      data.subject_id,
+      data.parent_id,
+      data.title,
+      data.description,
+      data.estimated_hours,
+      data.due_date,
+      data.sort_order || 0,
+    ]
+  );
+}
+
+export async function updateSyllabusItem(
+  id: number,
+  data: {
+    title?: string;
+    description?: string | null;
+    estimated_hours?: number | null;
+    due_date?: string | null;
+    is_completed?: number;
+  }
+): Promise<void> {
+  const updates: string[] = [];
+  const params: any[] = [];
+
+  if (data.title !== undefined) {
+    updates.push("title = ?");
+    params.push(data.title);
+  }
+  if (data.description !== undefined) {
+    updates.push("description = ?");
+    params.push(data.description);
+  }
+  if (data.estimated_hours !== undefined) {
+    updates.push("estimated_hours = ?");
+    params.push(data.estimated_hours);
+  }
+  if (data.due_date !== undefined) {
+    updates.push("due_date = ?");
+    params.push(data.due_date);
+  }
+  if (data.is_completed !== undefined) {
+    updates.push("is_completed = ?");
+    params.push(data.is_completed);
+  }
+
+  if (updates.length > 0) {
+    updates.push("updated_at = CURRENT_TIMESTAMP");
+    params.push(id);
+
+    await dbExecute(
+      `UPDATE syllabus_items SET ${updates.join(", ")} WHERE id = ?`,
+      params
+    );
+  }
+}
+
+export async function deleteSyllabusItem(id: number): Promise<void> {
+  await dbExecute("DELETE FROM syllabus_items WHERE id = ?", [id]);
+}
+
+export async function toggleSyllabusCompletion(id: number, isCompleted: number): Promise<void> {
+  await dbExecute(
+    "UPDATE syllabus_items SET is_completed = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+    [isCompleted, id]
+  );
+}
+
+export async function linkEntryToSyllabus(entryId: number, syllabusItemIds: number[]): Promise<void> {
+  // First, remove existing links
+  await dbExecute("DELETE FROM entry_syllabus_links WHERE entry_id = ?", [entryId]);
+
+  // Then add new links
+  for (const syllabusItemId of syllabusItemIds) {
+    await dbExecute(
+      "INSERT INTO entry_syllabus_links (entry_id, syllabus_item_id) VALUES (?, ?)",
+      [entryId, syllabusItemId]
+    );
+  }
+}
+
+export async function getEntrySyllabusLinks(entryId: number): Promise<any[]> {
+  return await dbSelect<any>(
+    `SELECT s.* FROM syllabus_items s
+     JOIN entry_syllabus_links l ON s.id = l.syllabus_item_id
+     WHERE l.entry_id = ?`,
+    [entryId]
+  );
+}

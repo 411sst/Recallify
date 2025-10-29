@@ -54,6 +54,7 @@ import {
 } from "../services/database";
 import { Subject, EntryWithDetails } from "../types";
 import { useRef } from "react";
+import SyllabusTab from "../components/SyllabusTab";
 
 export default function SubjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -421,6 +422,7 @@ export default function SubjectDetailPage() {
               {entries.length}
             </Badge>
           </Tab>
+          <Tab>📚 Syllabus</Tab>
           <Tab>
             Due Revisions
             <Badge ml={2} colorScheme={dueRevisions.length > 0 ? "orange" : "gray"}>
@@ -498,6 +500,10 @@ export default function SubjectDetailPage() {
                 ))}
               </VStack>
             )}
+          </TabPanel>
+
+          <TabPanel px={0}>
+            <SyllabusTab subject={subject} onUpdate={loadSubjectData} />
           </TabPanel>
 
           <TabPanel px={0}>

@@ -71,7 +71,11 @@ fn init_database(conn: &Connection) -> Result<()> {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             session_type TEXT NOT NULL CHECK(session_type IN ('work', 'short_break', 'long_break')),
             duration_minutes INTEGER NOT NULL,
-            completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            subject_id INTEGER,
+            syllabus_item_id INTEGER,
+            completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE SET NULL,
+            FOREIGN KEY (syllabus_item_id) REFERENCES syllabus_items(id) ON DELETE SET NULL
         );
 
         CREATE TABLE IF NOT EXISTS pomodoro_state (
@@ -85,6 +89,52 @@ fn init_database(conn: &Connection) -> Result<()> {
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
+        CREATE TABLE IF NOT EXISTS syllabus_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            subject_id INTEGER NOT NULL,
+            parent_id INTEGER,
+            title TEXT NOT NULL,
+            description TEXT,
+            estimated_hours REAL,
+            due_date DATE,
+            is_completed INTEGER DEFAULT 0,
+            sort_order INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+            FOREIGN KEY (parent_id) REFERENCES syllabus_items(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS entry_syllabus_links (
+            entry_id INTEGER NOT NULL,
+            syllabus_item_id INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (entry_id, syllabus_item_id),
+            FOREIGN KEY (entry_id) REFERENCES entries(id) ON DELETE CASCADE,
+            FOREIGN KEY (syllabus_item_id) REFERENCES syllabus_items(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS pdf_attachments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            entry_id INTEGER NOT NULL,
+            file_name TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            file_size INTEGER NOT NULL,
+            page_count INTEGER,
+            last_viewed_page INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (entry_id) REFERENCES entries(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS export_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            export_type TEXT NOT NULL,
+            file_name TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            file_size INTEGER,
+            exported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
         CREATE INDEX IF NOT EXISTS idx_entries_subject_id ON entries(subject_id);
         CREATE INDEX IF NOT EXISTS idx_entries_study_date ON entries(study_date);
         CREATE INDEX IF NOT EXISTS idx_revisions_entry_id ON revisions(entry_id);
@@ -93,6 +143,11 @@ fn init_database(conn: &Connection) -> Result<()> {
         CREATE INDEX IF NOT EXISTS idx_activity_log_entry_id ON activity_log(entry_id);
         CREATE INDEX IF NOT EXISTS idx_activity_log_activity_date ON activity_log(activity_date);
         CREATE INDEX IF NOT EXISTS idx_pomodoro_sessions_completed_at ON pomodoro_sessions(completed_at);
+        CREATE INDEX IF NOT EXISTS idx_pomodoro_sessions_subject_id ON pomodoro_sessions(subject_id);
+        CREATE INDEX IF NOT EXISTS idx_syllabus_items_subject_id ON syllabus_items(subject_id);
+        CREATE INDEX IF NOT EXISTS idx_syllabus_items_parent_id ON syllabus_items(parent_id);
+        CREATE INDEX IF NOT EXISTS idx_pdf_attachments_entry_id ON pdf_attachments(entry_id);
+        CREATE INDEX IF NOT EXISTS idx_export_history_exported_at ON export_history(exported_at);
         ",
     )?;
 
