@@ -69,3 +69,22 @@ export interface ActivityLogWithDetails extends ActivityLog {
   entry: Entry;
   subject: Subject;
 }
+
+// Pomodoro types
+export interface PomodoroSession {
+  id: number;
+  session_type: "work" | "short_break" | "long_break";
+  duration_minutes: number;
+  completed_at: string;
+}
+
+export interface PomodoroState {
+  id: number;
+  session_type: "work" | "short_break" | "long_break";
+  start_timestamp: number | null;
+  duration_seconds: number;
+  remaining_seconds: number;
+  is_running: number;
+  pomodoro_count: number;
+  updated_at: string;
+}
