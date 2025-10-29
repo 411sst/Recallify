@@ -152,15 +152,6 @@ export default function RichTextEditor({
                 colorScheme={editor.isActive("italic") ? "blue" : "gray"}
               />
             </Tooltip>
-            <Tooltip label="Underline">
-              <IconButton
-                aria-label="Underline"
-                icon={<Text textDecoration="underline">U</Text>}
-                onClick={() => editor.chain().focus().toggleUnderline().run()}
-                isActive={editor.isActive("underline")}
-                colorScheme={editor.isActive("underline") ? "blue" : "gray"}
-              />
-            </Tooltip>
             <Tooltip label="Strikethrough">
               <IconButton
                 aria-label="Strike"
