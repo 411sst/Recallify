@@ -62,7 +62,8 @@ export default function SyllabusTab({ subject, onUpdate }: SyllabusTabProps) {
     try {
       await toggleSyllabusCompletion(item.id, item.is_completed === 1 ? 0 : 1);
       loadSyllabus();
-      onUpdate();
+      // Don't call onUpdate() here - it reloads the entire page and switches tabs
+      // Just reload the syllabus data locally
     } catch (error) {
       toast({
         title: "Error updating item",
