@@ -4,9 +4,38 @@
 use once_cell::sync::Lazy;
 use rusqlite::{Connection, Result};
 use std::sync::Mutex;
+use std::path::PathBuf;
+use std::fs;
+
+fn get_app_data_dir() -> PathBuf {
+    #[cfg(target_os = "windows")]
+    {
+        use directories::BaseDirs;
+        if let Some(base_dirs) = BaseDirs::new() {
+            let app_data = base_dirs.data_local_dir().join("Recallify");
+            fs::create_dir_all(&app_data).expect("Failed to create app data directory");
+            return app_data;
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        use directories::ProjectDirs;
+        if let Some(proj_dirs) = ProjectDirs::from("com", "Recallify", "Recallify") {
+            let app_data = proj_dirs.data_dir().to_path_buf();
+            fs::create_dir_all(&app_data).expect("Failed to create app data directory");
+            return app_data;
+        }
+    }
+
+    // Fallback to current directory if all else fails
+    PathBuf::from(".")
+}
 
 static DB: Lazy<Mutex<Connection>> = Lazy::new(|| {
-    let conn = Connection::open("recallify.db").expect("Failed to open database");
+    let db_path = get_app_data_dir().join("recallify.db");
+    println!("Database location: {:?}", db_path);
+    let conn = Connection::open(&db_path).expect("Failed to open database");
     init_database(&conn).expect("Failed to initialize database");
     Mutex::new(conn)
 });
@@ -326,14 +355,8 @@ fn read_pdf_file(file_path: String) -> Result<Vec<u8>, String> {
 
 #[tauri::command]
 fn save_pdf_file(file_name: String, file_data: Vec<u8>) -> Result<String, String> {
-    use std::fs;
-    use std::path::PathBuf;
-
-    // Create pdfs directory in app data folder
-    let app_dir = std::env::current_dir()
-        .map_err(|e| format!("Failed to get current directory: {}", e))?;
-
-    let pdfs_dir = app_dir.join("pdfs");
+    // Create pdfs directory in app data folder (same location as database)
+    let pdfs_dir = get_app_data_dir().join("pdfs");
 
     // Create directory if it doesn't exist
     fs::create_dir_all(&pdfs_dir)
