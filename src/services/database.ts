@@ -948,3 +948,57 @@ export async function calculateStreaks() {
     totalActiveDays: activities.length,
   };
 }
+
+// Milestone Celebration Tracking
+export async function checkAndRecordMilestone(currentStreak: number) {
+  const milestones = [7, 14, 30, 50, 100, 180, 365];
+
+  // Check if current streak matches a milestone
+  if (!milestones.includes(currentStreak)) {
+    return null;
+  }
+
+  // Check if this milestone has already been celebrated
+  const existing = await dbSelect<any>(
+    "SELECT * FROM milestone_celebrations WHERE milestone_days = ?",
+    [currentStreak]
+  );
+
+  if (existing.length > 0 && existing[0].celebration_shown === 1) {
+    // Milestone already celebrated
+    return null;
+  }
+
+  // Record or update milestone achievement
+  if (existing.length === 0) {
+    // First time reaching this milestone
+    await dbExecute(
+      "INSERT INTO milestone_celebrations (milestone_days, achieved_at) VALUES (?, CURRENT_TIMESTAMP)",
+      [currentStreak]
+    );
+  }
+
+  // Return milestone data for celebration
+  return {
+    milestone: currentStreak,
+    shouldCelebrate: true,
+  };
+}
+
+export async function markMilestoneShown(milestoneDays: number) {
+  await dbExecute(
+    `UPDATE milestone_celebrations
+     SET celebration_shown = 1, shown_at = CURRENT_TIMESTAMP
+     WHERE milestone_days = ?`,
+    [milestoneDays]
+  );
+}
+
+export async function getMilestoneAchievements() {
+  return await dbSelect<any>(
+    `SELECT * FROM milestone_celebrations
+     WHERE celebration_shown = 1
+     ORDER BY milestone_days ASC`,
+    []
+  );
+}

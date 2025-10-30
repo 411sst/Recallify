@@ -249,6 +249,18 @@ fn init_database(conn: &Connection) -> Result<()> {
         "CREATE INDEX IF NOT EXISTS idx_daily_activity_date ON daily_activity(activity_date)",
         [],
     )?;
+
+    // v3.2 Migration: Add milestone_celebrations table
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS milestone_celebrations (
+            milestone_days INTEGER PRIMARY KEY,
+            achieved_at TIMESTAMP NOT NULL,
+            celebration_shown INTEGER DEFAULT 0,
+            shown_at TIMESTAMP
+        )",
+        [],
+    )?;
+
     conn.execute(
         "INSERT OR IGNORE INTO settings (key, value) VALUES ('pomodoro_sound_enabled', 'true')",
         [],
