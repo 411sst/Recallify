@@ -768,3 +768,53 @@ export async function getAllSubjectsStudyTime(days: number = 7): Promise<any[]> 
     []
   );
 }
+
+// ============= TAGS =============
+
+export async function getAllTags() {
+  return await dbSelect<any>("SELECT * FROM tags ORDER BY usage_count DESC, name ASC", []);
+}
+
+export async function getOrCreateTag(tagName: string): Promise<number> {
+  const normalizedName = tagName.trim().toLowerCase();
+  if (!normalizedName) throw new Error("Tag name cannot be empty");
+
+  // Check if tag exists
+  const existing = await dbSelect<any>("SELECT id FROM tags WHERE name = ?", [normalizedName]);
+
+  if (existing.length > 0) {
+    // Increment usage count
+    await dbExecute("UPDATE tags SET usage_count = usage_count + 1 WHERE id = ?", [existing[0].id]);
+    return existing[0].id;
+  }
+
+  // Create new tag
+  const result = await dbExecute("INSERT INTO tags (name) VALUES (?)", [normalizedName]);
+  return result.lastInsertId;
+}
+
+export async function linkTagsToEntry(entryId: number, tagNames: string[]) {
+  // Remove existing tags for this entry
+  await dbExecute("DELETE FROM entry_tags WHERE entry_id = ?", [entryId]);
+
+  // Add new tags
+  for (const tagName of tagNames) {
+    if (tagName.trim()) {
+      const tagId = await getOrCreateTag(tagName);
+      await dbExecute(
+        "INSERT OR IGNORE INTO entry_tags (entry_id, tag_id) VALUES (?, ?)",
+        [entryId, tagId]
+      );
+    }
+  }
+}
+
+export async function getEntryTags(entryId: number) {
+  return await dbSelect<any>(
+    `SELECT t.* FROM tags t
+     INNER JOIN entry_tags et ON t.id = et.tag_id
+     WHERE et.entry_id = ?
+     ORDER BY t.name`,
+    [entryId]
+  );
+}
