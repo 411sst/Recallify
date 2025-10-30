@@ -164,6 +164,23 @@ fn init_database(conn: &Connection) -> Result<()> {
             exported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
+        CREATE TABLE IF NOT EXISTS tags (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE NOT NULL,
+            color TEXT DEFAULT '#3B82F6',
+            usage_count INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS entry_tags (
+            entry_id INTEGER NOT NULL,
+            tag_id INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (entry_id, tag_id),
+            FOREIGN KEY (entry_id) REFERENCES entries(id) ON DELETE CASCADE,
+            FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+        );
+
         CREATE INDEX IF NOT EXISTS idx_entries_subject_id ON entries(subject_id);
         CREATE INDEX IF NOT EXISTS idx_entries_study_date ON entries(study_date);
         CREATE INDEX IF NOT EXISTS idx_revisions_entry_id ON revisions(entry_id);
@@ -207,6 +224,13 @@ fn init_database(conn: &Connection) -> Result<()> {
         "INSERT OR IGNORE INTO settings (key, value) VALUES ('pomodoro_long_break_default', '20')",
         [],
     )?;
+
+    // v3.0 Migration: Add topics column to entries table
+    // Use ALTER TABLE with error handling - ignore if column already exists
+    let _ = conn.execute(
+        "ALTER TABLE entries ADD COLUMN topics TEXT",
+        [],
+    );
     conn.execute(
         "INSERT OR IGNORE INTO settings (key, value) VALUES ('pomodoro_sound_enabled', 'true')",
         [],
