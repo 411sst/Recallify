@@ -1,10 +1,10 @@
-# Recallify v3.0
+# Recallify v3.2
 
-**A comprehensive study environment with spaced repetition, syllabus management, rich text editing, productivity tools, and advanced UX features.**
+**A comprehensive study environment with spaced repetition, syllabus management, rich text editing, productivity tools, gamification, and advanced UX features.**
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 
@@ -14,9 +14,9 @@
 
 ## 🎯 Overview
 
-Recallify is a desktop application that combines scientifically-backed spaced repetition with modern study tools. Organize your learning with structured syllabi, take rich formatted notes, attach PDFs, track your study time with tags and topics, and leverage automated revision scheduling to maximize retention.
+Recallify is a desktop application that combines scientifically-backed spaced repetition with modern study tools. Organize your learning with structured syllabi, take rich formatted notes, track your study time with tags and topics, build consistent study habits with streak tracking, and leverage automated revision scheduling to maximize retention.
 
-**New in v3.0:** Study analytics dashboard, pomodoro subject tracking, session history, collapsible sidebar, auto-start pomodoro, tags system, enhanced notifications, and improved dark mode!
+**New in v3.2:** Streak tracking with calendar heatmap, milestone celebrations, comprehensive tag management, bug fixes for better readability, and improved editing experience!
 
 **Perfect for:**
 - 🎓 University students managing multiple courses
@@ -26,7 +26,63 @@ Recallify is a desktop application that combines scientifically-backed spaced re
 
 ---
 
-## 🆕 What's New in v3.0
+## 🆕 What's New in v3.2
+
+### 🔥 Streak Tracking & Gamification
+- **Daily Streak Counter**: Track consecutive days of study
+  - Visual streak indicators with emoji progression
+  - Current streak and all-time longest streak display
+  - Total active study days counter
+- **Calendar Heatmap**: GitHub-style contribution graph
+  - Visualize study activity over time (3/6/12 month views)
+  - Color intensity based on study duration
+  - Interactive tooltips with date and study time
+  - Dark mode support with accessible colors
+- **Milestone Celebrations**: Automatic achievement recognition
+  - Celebrate at 7, 14, 30, 50, 100, 180, and 365-day milestones
+  - Custom messages and emojis for each achievement
+  - Modal celebrations with motivational messages
+  - Badge indicators for unlocked milestones
+- **Activity Tracking**: Automatic study day detection
+  - Counts as active if: complete 1+ pomodoro OR create 1+ study log
+  - Daily activity aggregation with stats
+  - Study minutes, pomodoro count, entry count tracked
+
+### 🏷️ Tag Management Dashboard
+- **Centralized Tag Overview**: View and manage all tags in one place
+  - Search tags by name (real-time filtering)
+  - Sort by usage, name (A-Z), or creation date
+  - Filter by usage ranges (unused, 1-5 uses, 5+ uses)
+- **Tag Statistics**: Comprehensive tag analytics
+  - Total tags with used/unused breakdown
+  - Most used tag with count
+  - Active tags count
+  - Average uses per tag
+- **Tag Cards**: Organized grid layout
+  - Tag name with colored badge
+  - Usage count display
+  - Clean, scannable interface
+- **Dark Mode Support**: Full theme compatibility
+
+### 🔧 Bug Fixes (v3.2)
+- **Study Log Preview**: No more raw HTML in previews
+  - Topics field displayed when present
+  - Clean text preview using HTML stripping
+  - Consistent across Subject and History pages
+- **Dark Mode Text**: Improved visibility
+  - All text properly readable in dark mode
+  - WCAG AA compliant contrast ratios
+  - Card backgrounds adapt to theme
+- **Sticky Toolbar**: Editor toolbar stays visible
+  - Formatting tools accessible while scrolling
+  - Improved editing experience for long notes
+- **PDF Import Removed**: Simplified interface
+  - PDF feature removed as per design review
+  - Cleaner study log creation workflow
+
+---
+
+## ✨ What Was New in v3.0
 
 ### 🎨 Enhanced User Experience
 - **Collapsible Sidebar**: Toggle sidebar with ← button or Ctrl/Cmd + B
@@ -442,7 +498,16 @@ C:\Users\YourName\AppData\Local\Recallify\
 
 ## 🚧 Roadmap
 
-### ✅ v3.0 (Current Release - Complete!)
+### ✅ v3.2 (Current Release - Complete!)
+- [x] Streak tracking with calendar heatmap
+- [x] Milestone celebrations (7, 14, 30, 50, 100, 180, 365 days)
+- [x] Tag management dashboard with filtering
+- [x] Study log preview bug fixes
+- [x] Dark mode text visibility improvements
+- [x] Sticky editor toolbar
+- [x] PDF import feature removal
+
+### ✅ v3.0 (Released)
 - [x] Collapsible sidebar with keyboard shortcut
 - [x] Auto-start pomodoro sessions
 - [x] Tags system for study logs
@@ -454,17 +519,16 @@ C:\Users\YourName\AppData\Local\Recallify\
 - [x] Study analytics dashboard (time per subject, charts)
 - [x] Pomodoro history log page
 
-### v3.1 (Next Release)
-- [ ] Study streak tracking with calendar heatmap
-- [ ] Tag filtering and management page
-- [ ] Search across all notes
+### v3.3 (Next Release)
+- [ ] Search across all notes and subjects
 - [ ] Export individual notes to PDF/Markdown
+- [ ] Tag editing and merging capabilities
+- [ ] Custom streak goals and reminders
 
-### v3.2 (Future)
+### v3.4 (Future)
 - [ ] Export system (PDF, Markdown, HTML, JSON)
 - [ ] Automated backup/restore
-- [ ] Custom themes
-- [ ] PDF annotations
+- [ ] Custom themes and color schemes
 - [ ] Flashcard mode from notes
 
 ### v4.0 (Long-term)
