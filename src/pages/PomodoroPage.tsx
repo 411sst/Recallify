@@ -40,11 +40,19 @@ export default function PomodoroPage() {
   const [longBreakDuration, setLongBreakDuration] = useState(20);
   const [autoStartCountdown, setAutoStartCountdown] = useState(0);
   const [nextSessionType, setNextSessionType] = useState<"work" | "short_break" | "long_break" | null>(null);
+  const [subjects, setSubjects] = useState<any[]>([]);
+  const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
+  const [selectedSubjectName, setSelectedSubjectName] = useState<string>("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isAutoStartOpen,
     onOpen: onAutoStartOpen,
     onClose: onAutoStartClose,
+  } = useDisclosure();
+  const {
+    isOpen: isSubjectSelectOpen,
+    onOpen: onSubjectSelectOpen,
+    onClose: onSubjectSelectClose,
   } = useDisclosure();
   const toast = useToast();
 
@@ -56,9 +64,11 @@ export default function PomodoroPage() {
   const breakBorderColor = useColorModeValue("teal.500", "#2DD4BF");
   const pageBg = useColorModeValue("transparent", "#0f0f0f");
   const breakPageBg = useColorModeValue("teal.50", "#1a2f2c");
+  const hoverBg = useColorModeValue("gray.50", "#252525");
 
   useEffect(() => {
     loadPomodoroState();
+    loadSubjects();
   }, []);
 
   useEffect(() => {
@@ -103,6 +113,18 @@ export default function PomodoroPage() {
     }
   }
 
+  async function loadSubjects() {
+    try {
+      const result = await invoke<any[]>("db_select", {
+        sql: "SELECT id, name FROM subjects ORDER BY name ASC",
+        params: [],
+      });
+      setSubjects(result);
+    } catch (error) {
+      console.error("Error loading subjects:", error);
+    }
+  }
+
   async function tick() {
     try {
       const result = await invoke<any[]>("db_select", {
@@ -126,6 +148,15 @@ export default function PomodoroPage() {
     }
   }
 
+  function handleStartTimer() {
+    // If starting a work session, require subject selection
+    if (state.session_type === "work" && !selectedSubjectId) {
+      onSubjectSelectOpen();
+    } else {
+      startTimer();
+    }
+  }
+
   async function startTimer() {
     try {
       await invoke("db_execute", {
@@ -140,6 +171,13 @@ export default function PomodoroPage() {
         duration: 3000,
       });
     }
+  }
+
+  function handleSubjectSelect(subjectId: number, subjectName: string) {
+    setSelectedSubjectId(subjectId);
+    setSelectedSubjectName(subjectName);
+    onSubjectSelectClose();
+    startTimer();
   }
 
   async function pauseTimer() {
@@ -171,6 +209,9 @@ export default function PomodoroPage() {
         is_running: 0,
         pomodoro_count: 0,
       });
+      // Clear selected subject when resetting
+      setSelectedSubjectId(null);
+      setSelectedSubjectName("");
       toast({
         title: "Session reset",
         description: "Timer reset to beginning. Ready to start fresh!",
@@ -194,8 +235,8 @@ export default function PomodoroPage() {
       // Save completed session
       const durationMinutes = state.session_type === "work" ? 25 : state.session_type === "short_break" ? 5 : longBreakDuration;
       await invoke("db_execute", {
-        sql: "INSERT INTO pomodoro_sessions (session_type, duration_minutes) VALUES (?, ?)",
-        params: [state.session_type, durationMinutes],
+        sql: "INSERT INTO pomodoro_sessions (session_type, duration_minutes, subject_id) VALUES (?, ?, ?)",
+        params: [state.session_type, durationMinutes, state.session_type === "work" ? selectedSubjectId : null],
       });
 
       const isWorkComplete = state.session_type === "work";
@@ -356,9 +397,15 @@ export default function PomodoroPage() {
           </VStack>
         </Circle>
 
+        {selectedSubjectName && state.session_type === "work" && (
+          <Text fontSize="lg" color={textColor} fontWeight="semibold">
+            📖 {selectedSubjectName}
+          </Text>
+        )}
+
         <HStack spacing={4}>
           {state.is_running === 0 ? (
-            <Button onClick={startTimer} size="lg" px={12}>
+            <Button onClick={handleStartTimer} size="lg" px={12}>
               {state.remaining_seconds === (state.session_type === "work" ? 1500 : state.session_type === "short_break" ? 300 : longBreakDuration * 60) ? "Start" : "Resume"}
             </Button>
           ) : (
@@ -445,6 +492,37 @@ export default function PomodoroPage() {
               size="lg"
             >
               {nextSessionType === "work" ? "Start Now" : "Start Break Now"}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Subject Selection Modal */}
+      <Modal isOpen={isSubjectSelectOpen} onClose={onSubjectSelectClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Select Subject</ModalHeader>
+          <ModalBody>
+            <Text mb={4} color={secondaryTextColor}>
+              Choose the subject you'll be studying during this pomodoro session:
+            </Text>
+            <VStack spacing={2} align="stretch">
+              {subjects.map((subject) => (
+                <Button
+                  key={subject.id}
+                  onClick={() => handleSubjectSelect(subject.id, subject.name)}
+                  variant="outline"
+                  justifyContent="flex-start"
+                  _hover={{ bg: hoverBg }}
+                >
+                  📖 {subject.name}
+                </Button>
+              ))}
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" onClick={onSubjectSelectClose}>
+              Cancel
             </Button>
           </ModalFooter>
         </ModalContent>

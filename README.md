@@ -16,7 +16,7 @@
 
 Recallify is a desktop application that combines scientifically-backed spaced repetition with modern study tools. Organize your learning with structured syllabi, take rich formatted notes, attach PDFs, track your study time with tags and topics, and leverage automated revision scheduling to maximize retention.
 
-**New in v3.0:** Collapsible sidebar, auto-start pomodoro, tags system, enhanced notifications, and improved dark mode!
+**New in v3.0:** Study analytics dashboard, pomodoro subject tracking, session history, collapsible sidebar, auto-start pomodoro, tags system, enhanced notifications, and improved dark mode!
 
 **Perfect for:**
 - 🎓 University students managing multiple courses
@@ -66,6 +66,22 @@ Recallify is a desktop application that combines scientifically-backed spaced re
   - High contrast text (WCAG AA compliant)
   - Consistent colors throughout
   - Smooth theme transitions
+
+### 📊 Study Analytics & Tracking
+- **Subject Selection for Pomodoro**: Link study sessions to subjects
+  - Modal popup when starting work session
+  - Subject name displayed during timer
+  - All work sessions linked to subjects for analytics
+- **Analytics Dashboard**: Comprehensive study statistics
+  - Time per subject with visual progress bars
+  - Today / Week / Month / All-time stats
+  - Average session time and daily averages
+  - Work vs break session tracking
+- **Pomodoro History**: Detailed session log
+  - Timeline view grouped by date
+  - Filter by subject
+  - Session type badges (work/short break/long break)
+  - Daily study time totals
 
 ### 🔧 Bug Fixes
 - **Pomodoro Reset**: Properly resets entire session (timer + count)
@@ -230,17 +246,41 @@ src-tauri/target/release/bundle/
 
 1. Go to **🍅 Pomodoro** in sidebar
 2. Click **"Start"**
-3. Timer runs for 25 minutes (work session)
-4. After completion: 5-min short break (or 20-min long break after 4 sessions)
-5. System notification + optional sound alert
-6. Sessions logged for analytics
+3. **Select a subject** from the modal (for work sessions)
+4. Timer runs for 25 minutes (work session)
+5. After completion: 5-second auto-start countdown for break
+   - Click "Start Now" to skip countdown
+   - Click "Cancel" to stay on completion screen
+6. System notification + toast + tab flashing + sound alert
+7. Sessions automatically logged for analytics
+
+### Viewing Study Analytics
+
+1. Go to **📊 Analytics** in sidebar
+2. **Overview tab**: See today/week/month/all-time statistics
+   - Total study time and session counts
+   - Average session time
+   - Daily averages
+3. **By Subject tab**: Time breakdown per subject
+   - Visual progress bars
+   - Pomodoro count per subject
+   - Average time per session
+
+### Viewing Pomodoro History
+
+1. Go to **🕐 Sessions** in sidebar
+2. View chronological log of all completed sessions
+3. Filter by subject using dropdown
+4. See daily study time totals
+5. Session types shown with color-coded badges
 
 ### Tracking Progress
 
 - **Syllabus Tab**: Check completion percentage and progress bars
+- **Analytics Dashboard**: View detailed study time statistics and subject breakdowns
+- **Sessions Log**: See complete history of all pomodoro sessions
 - **Calendar View**: See all revisions by month with color-coded status
 - **History**: Timeline of all study and revision activities
-- **Settings**: View study analytics (coming soon)
 
 ---
 
@@ -259,7 +299,9 @@ Recallify/
 │   ├── pages/                    # Page components
 │   │   ├── SubjectsPage.tsx
 │   │   ├── SubjectDetailPage.tsx
-│   │   ├── PomodoroPage.tsx     # Timer
+│   │   ├── PomodoroPage.tsx     # Timer with subject selection
+│   │   ├── AnalyticsPage.tsx    # Study analytics dashboard
+│   │   ├── PomodoroHistoryPage.tsx  # Session history log
 │   │   ├── CalendarPage.tsx
 │   │   ├── HistoryPage.tsx
 │   │   └── SettingsPage.tsx
@@ -408,14 +450,15 @@ C:\Users\YourName\AppData\Local\Recallify\
 - [x] Topics field for study entries
 - [x] Improved dark mode (WCAG AA compliant)
 - [x] Pomodoro reset bug fix
+- [x] Subject selection when starting Pomodoro timer
+- [x] Study analytics dashboard (time per subject, charts)
+- [x] Pomodoro history log page
 
 ### v3.1 (Next Release)
-- [ ] Subject selection when starting Pomodoro timer
-- [ ] Study analytics dashboard (time per subject, charts)
-- [ ] Pomodoro history log page
 - [ ] Study streak tracking with calendar heatmap
 - [ ] Tag filtering and management page
 - [ ] Search across all notes
+- [ ] Export individual notes to PDF/Markdown
 
 ### v3.2 (Future)
 - [ ] Export system (PDF, Markdown, HTML, JSON)

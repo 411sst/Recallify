@@ -6,6 +6,8 @@ import { getRevisionsDueToday } from "../services/database";
 const menuItems = [
   { path: "/", label: "Subjects", icon: "📚" },
   { path: "/pomodoro", label: "Pomodoro", icon: "🍅" },
+  { path: "/analytics", label: "Analytics", icon: "📊" },
+  { path: "/pomodoro-history", label: "Sessions", icon: "🕐" },
   { path: "/calendar", label: "Calendar", icon: "📅" },
   { path: "/history", label: "History", icon: "📜" },
   { path: "/settings", label: "Settings", icon: "⚙️" },
