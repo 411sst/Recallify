@@ -14,7 +14,6 @@ import {
   StatLabel,
   StatNumber,
   StatHelpText,
-  Badge,
   useColorModeValue,
   InputGroup,
   InputLeftElement,
