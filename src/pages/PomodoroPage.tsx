@@ -198,10 +198,24 @@ export default function PomodoroPage() {
         params: [state.session_type, durationMinutes],
       });
 
-      // Send notification
-      await sendNotification({
-        title: state.session_type === "work" ? "Pomodoro Complete!" : "Break Over!",
-        body: state.session_type === "work" ? "Time for a break!" : "Ready to focus?",
+      const isWorkComplete = state.session_type === "work";
+      const title = isWorkComplete ? "🎉 Pomodoro Complete!" : "☕ Break Over!";
+      const body = isWorkComplete ? "Time for a break!" : "Ready to focus?";
+
+      // Send system notification
+      await sendNotification({ title, body });
+
+      // Flash browser tab title
+      flashTabTitle(title);
+
+      // Show toast notification
+      toast({
+        title,
+        description: body,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
       });
 
       // Determine next session and trigger auto-start
@@ -225,6 +239,22 @@ export default function PomodoroPage() {
     } catch (error) {
       console.error("Error completing session:", error);
     }
+  }
+
+  function flashTabTitle(message: string) {
+    const originalTitle = document.title;
+    let flashCount = 0;
+    const maxFlashes = 6;
+
+    const interval = setInterval(() => {
+      document.title = flashCount % 2 === 0 ? message : originalTitle;
+      flashCount++;
+
+      if (flashCount >= maxFlashes) {
+        clearInterval(interval);
+        document.title = originalTitle;
+      }
+    }, 1000);
   }
 
   async function handleAutoStart() {
