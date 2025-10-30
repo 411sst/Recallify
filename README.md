@@ -1,10 +1,10 @@
-# Recallify v2.0
+# Recallify v3.0
 
-**A comprehensive study environment with spaced repetition, syllabus management, rich text editing, and productivity tools.**
+**A comprehensive study environment with spaced repetition, syllabus management, rich text editing, productivity tools, and advanced UX features.**
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 
@@ -14,7 +14,9 @@
 
 ## 🎯 Overview
 
-Recallify is a desktop application that combines scientifically-backed spaced repetition with modern study tools. Organize your learning with structured syllabi, take rich formatted notes, attach PDFs, track your study time, and leverage automated revision scheduling to maximize retention.
+Recallify is a desktop application that combines scientifically-backed spaced repetition with modern study tools. Organize your learning with structured syllabi, take rich formatted notes, attach PDFs, track your study time with tags and topics, and leverage automated revision scheduling to maximize retention.
+
+**New in v3.0:** Collapsible sidebar, auto-start pomodoro, tags system, enhanced notifications, and improved dark mode!
 
 **Perfect for:**
 - 🎓 University students managing multiple courses
@@ -24,7 +26,55 @@ Recallify is a desktop application that combines scientifically-backed spaced re
 
 ---
 
-## ✨ Key Features
+## 🆕 What's New in v3.0
+
+### 🎨 Enhanced User Experience
+- **Collapsible Sidebar**: Toggle sidebar with ← button or Ctrl/Cmd + B
+  - Icon-only view when collapsed (60px wide)
+  - Tooltips show labels on hover
+  - State persists across sessions
+  - More screen space for content
+
+### 🍅 Improved Pomodoro Timer
+- **Auto-Start Sessions**: Automatic transition between study and breaks
+  - 5-second countdown with cancel option
+  - "Start Now" button to skip countdown
+  - Visual modal with large countdown display
+- **Enhanced Notifications**: Multiple notification types
+  - System notifications (Windows/macOS/Linux)
+  - Toast notifications (top-right corner)
+  - Browser tab title flashing
+  - Increased sound volume (80%)
+
+### 🏷️ Tags System
+- **Tag Your Study Logs**: Categorize entries with custom tags
+  - Comma-separated tag input
+  - Tags displayed as colored badges
+  - Automatic tag suggestions
+  - Reusable tags with usage tracking
+  - Examples: #difficult, #review-needed, #practice-more
+
+### 📝 Study Log Enhancements
+- **Topics Field**: Dedicated field for quick topic identification
+  - Shows in list view for easy scanning
+  - Separate from detailed study notes
+- **Tags Integration**: Filter and organize by tags
+
+### 🌙 Improved Dark Mode
+- **Complete Theme Coverage**: All UI elements support dark mode
+  - Sidebar properly styled
+  - High contrast text (WCAG AA compliant)
+  - Consistent colors throughout
+  - Smooth theme transitions
+
+### 🔧 Bug Fixes
+- **Pomodoro Reset**: Properly resets entire session (timer + count)
+- **Dark Mode Text**: All text now visible with proper contrast
+- **Sidebar Theme**: Sidebar background changes in dark mode
+
+---
+
+## ✨ Core Features (v2.0 & Earlier)
 
 ### 📚 Syllabus Management
 - **Hierarchical Structure**: Organize courses into modules, topics, and subtopics
@@ -350,21 +400,31 @@ C:\Users\YourName\AppData\Local\Recallify\
 
 ## 🚧 Roadmap
 
-### v2.1 (Next Release)
+### ✅ v3.0 (Current Release - Complete!)
+- [x] Collapsible sidebar with keyboard shortcut
+- [x] Auto-start pomodoro sessions
+- [x] Tags system for study logs
+- [x] Enhanced notifications (system + toast + tab flash)
+- [x] Topics field for study entries
+- [x] Improved dark mode (WCAG AA compliant)
+- [x] Pomodoro reset bug fix
+
+### v3.1 (Next Release)
 - [ ] Subject selection when starting Pomodoro timer
 - [ ] Study analytics dashboard (time per subject, charts)
+- [ ] Pomodoro history log page
+- [ ] Study streak tracking with calendar heatmap
+- [ ] Tag filtering and management page
+- [ ] Search across all notes
+
+### v3.2 (Future)
 - [ ] Export system (PDF, Markdown, HTML, JSON)
 - [ ] Automated backup/restore
-- [ ] Export history tracking
-
-### v2.2 (Future)
-- [ ] Search across all notes
-- [ ] Tags and filtering
 - [ ] Custom themes
 - [ ] PDF annotations
 - [ ] Flashcard mode from notes
 
-### v3.0 (Long-term)
+### v4.0 (Long-term)
 - [ ] Cloud sync & multi-device
 - [ ] Mobile apps (iOS/Android)
 - [ ] Collaboration features
