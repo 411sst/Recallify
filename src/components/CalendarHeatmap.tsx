@@ -1,5 +1,5 @@
 import { Box, Text, HStack, VStack, Tooltip, useColorModeValue } from "@chakra-ui/react";
-import { format, eachDayOfInterval, startOfMonth, endOfMonth, subMonths, startOfWeek, endOfWeek } from "date-fns";
+import { format, eachDayOfInterval, subMonths } from "date-fns";
 
 interface DailyActivity {
   activity_date: string;
