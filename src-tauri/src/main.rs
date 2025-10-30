@@ -207,6 +207,13 @@ fn init_database(conn: &Connection) -> Result<()> {
         "INSERT OR IGNORE INTO settings (key, value) VALUES ('pomodoro_long_break_default', '20')",
         [],
     )?;
+
+    // v3.0 Migration: Add topics column to entries table
+    // Use ALTER TABLE with error handling - ignore if column already exists
+    let _ = conn.execute(
+        "ALTER TABLE entries ADD COLUMN topics TEXT",
+        [],
+    );
     conn.execute(
         "INSERT OR IGNORE INTO settings (key, value) VALUES ('pomodoro_sound_enabled', 'true')",
         [],
