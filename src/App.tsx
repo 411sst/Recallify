@@ -5,8 +5,10 @@ import Sidebar from "./components/Sidebar";
 import SubjectsPage from "./pages/SubjectsPage";
 import SubjectDetailPage from "./pages/SubjectDetailPage";
 import PomodoroPage from "./pages/PomodoroPage";
+import StreakPage from "./pages/StreakPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import PomodoroHistoryPage from "./pages/PomodoroHistoryPage";
+import TagManagementPage from "./pages/TagManagementPage";
 import CalendarPage from "./pages/CalendarPage";
 import HistoryPage from "./pages/HistoryPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -33,8 +35,10 @@ function App() {
           <Route path="/" element={<SubjectsPage />} />
           <Route path="/subjects/:id" element={<SubjectDetailPage />} />
           <Route path="/pomodoro" element={<PomodoroPage />} />
+          <Route path="/streaks" element={<StreakPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/pomodoro-history" element={<PomodoroHistoryPage />} />
+          <Route path="/tags" element={<TagManagementPage />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/settings" element={<SettingsPage />} />
