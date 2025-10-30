@@ -38,7 +38,14 @@ export default function PomodoroPage() {
     pomodoro_count: 0,
   });
   const [longBreakDuration, setLongBreakDuration] = useState(20);
+  const [autoStartCountdown, setAutoStartCountdown] = useState(0);
+  const [nextSessionType, setNextSessionType] = useState<"work" | "short_break" | "long_break" | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isAutoStartOpen,
+    onOpen: onAutoStartOpen,
+    onClose: onAutoStartClose,
+  } = useDisclosure();
   const toast = useToast();
 
   // Dark mode colors
@@ -62,6 +69,19 @@ export default function PomodoroPage() {
       return () => clearInterval(interval);
     }
   }, [state.is_running]);
+
+  // Auto-start countdown effect
+  useEffect(() => {
+    if (autoStartCountdown > 0) {
+      const timeout = setTimeout(() => {
+        setAutoStartCountdown(autoStartCountdown - 1);
+      }, 1000);
+      return () => clearTimeout(timeout);
+    } else if (autoStartCountdown === 0 && nextSessionType && isAutoStartOpen) {
+      // Countdown finished, start next session
+      handleAutoStart();
+    }
+  }, [autoStartCountdown, nextSessionType, isAutoStartOpen]);
 
   async function loadPomodoroState() {
     try {
@@ -184,21 +204,46 @@ export default function PomodoroPage() {
         body: state.session_type === "work" ? "Time for a break!" : "Ready to focus?",
       });
 
-      // Determine next session
+      // Determine next session and trigger auto-start
       if (state.session_type === "work") {
         const newCount = state.pomodoro_count + 1;
         if (newCount === 4) {
-          // Show long break modal
+          // Show long break modal (user must choose)
           onOpen();
         } else {
-          await transitionToBreak("short_break", newCount);
+          // Trigger auto-start for short break
+          setNextSessionType("short_break");
+          setAutoStartCountdown(5);
+          onAutoStartOpen();
         }
       } else {
-        await transitionToWork();
+        // Trigger auto-start for work session
+        setNextSessionType("work");
+        setAutoStartCountdown(5);
+        onAutoStartOpen();
       }
     } catch (error) {
       console.error("Error completing session:", error);
     }
+  }
+
+  async function handleAutoStart() {
+    onAutoStartClose();
+    if (nextSessionType === "work") {
+      await transitionToWork();
+      await startTimer();
+    } else if (nextSessionType === "short_break") {
+      const newCount = state.pomodoro_count + 1;
+      await transitionToBreak("short_break", newCount);
+      await startTimer();
+    }
+    setNextSessionType(null);
+  }
+
+  function handleCancelAutoStart() {
+    setAutoStartCountdown(0);
+    setNextSessionType(null);
+    onAutoStartClose();
   }
 
   async function transitionToBreak(breakType: "short_break" | "long_break", count: number) {
@@ -241,7 +286,9 @@ export default function PomodoroPage() {
   function playSound() {
     try {
       const audio = new Audio("/timer-complete.mp3");
-      audio.volume = 0.5;
+      // Increased volume to 80% (from 50%) for better audibility
+      // Loud enough to hear from across the room but not jarring
+      audio.volume = 0.8;
       audio.play().catch(() => console.log("Sound play failed"));
     } catch (error) {
       console.log("Sound not available");
@@ -315,6 +362,60 @@ export default function PomodoroPage() {
               Skip Break
             </Button>
             <Button onClick={handleLongBreak}>Start Break</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Auto-Start Modal */}
+      <Modal isOpen={isAutoStartOpen} onClose={handleCancelAutoStart} isCentered>
+        <ModalOverlay bg="blackAlpha.700" />
+        <ModalContent>
+          <ModalHeader textAlign="center">
+            {state.session_type === "work" ? "✓ Study Session Complete!" : "☕ Break Over!"}
+          </ModalHeader>
+          <ModalBody>
+            <VStack spacing={6}>
+              <Text fontSize="lg" textAlign="center">
+                {state.session_type === "work"
+                  ? "🎉 Great work! You completed 25 minutes."
+                  : "Ready to focus?"}
+              </Text>
+
+              <Box textAlign="center">
+                <Text fontSize="6xl" fontWeight="bold" color="primary.500">
+                  {autoStartCountdown}
+                </Text>
+                <Text fontSize="md" color="text.tertiary">
+                  {nextSessionType === "work"
+                    ? "Study session starting in..."
+                    : "5-minute break starting in..."}
+                </Text>
+              </Box>
+
+              <Text fontSize="sm" color="text.secondary" textAlign="center">
+                {nextSessionType === "work"
+                  ? "Get ready to focus on your next study session"
+                  : "Time for a well-deserved break!"}
+              </Text>
+            </VStack>
+          </ModalBody>
+          <ModalFooter justifyContent="center" gap={3}>
+            <Button
+              variant="outline"
+              onClick={handleCancelAutoStart}
+              size="lg"
+            >
+              Cancel Auto-Start
+            </Button>
+            <Button
+              colorScheme="teal"
+              onClick={() => {
+                setAutoStartCountdown(0);
+              }}
+              size="lg"
+            >
+              {nextSessionType === "work" ? "Start Now" : "Start Break Now"}
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
