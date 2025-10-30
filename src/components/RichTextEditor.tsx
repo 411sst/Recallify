@@ -130,6 +130,9 @@ export default function RichTextEditor({
         borderBottom="1px solid"
         borderColor={colorMode === "dark" ? "gray.600" : "gray.300"}
         bg={colorMode === "dark" ? "gray.700" : "gray.50"}
+        position="sticky"
+        top="0"
+        zIndex="10"
       >
         <HStack spacing={2} flexWrap="wrap">
           {/* Text Formatting */}
