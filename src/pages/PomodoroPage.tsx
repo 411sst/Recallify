@@ -18,6 +18,7 @@ import {
   FormControl,
   FormLabel,
   useDisclosure,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { invoke } from "@tauri-apps/api/tauri";
 import { sendNotification } from "@tauri-apps/api/notification";
@@ -39,6 +40,15 @@ export default function PomodoroPage() {
   const [longBreakDuration, setLongBreakDuration] = useState(20);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+
+  // Dark mode colors
+  const circleBg = useColorModeValue("white", "#1a1a1a");
+  const textColor = useColorModeValue("#0A122A", "#ffffff");
+  const secondaryTextColor = useColorModeValue("#2F2F2F", "#b0b0b0");
+  const workBorderColor = useColorModeValue("primary.500", "#1EA896");
+  const breakBorderColor = useColorModeValue("teal.500", "#2DD4BF");
+  const pageBg = useColorModeValue("transparent", "#0f0f0f");
+  const breakPageBg = useColorModeValue("teal.50", "#1a2f2c");
 
   useEffect(() => {
     loadPomodoroState();
@@ -130,12 +140,23 @@ export default function PomodoroPage() {
 
   async function resetTimer() {
     try {
-      const duration = state.session_type === "work" ? 1500 : state.session_type === "short_break" ? 300 : longBreakDuration * 60;
+      // Reset entire session: back to work mode with 25 minutes and reset counter
       await invoke("db_execute", {
-        sql: "UPDATE pomodoro_state SET remaining_seconds = ?, is_running = 0, updated_at = CURRENT_TIMESTAMP WHERE id = 1",
-        params: [duration],
+        sql: "UPDATE pomodoro_state SET session_type = 'work', remaining_seconds = 1500, duration_seconds = 1500, is_running = 0, pomodoro_count = 0, updated_at = CURRENT_TIMESTAMP WHERE id = 1",
+        params: [],
       });
-      setState((prev) => ({ ...prev, remaining_seconds: duration, is_running: 0 }));
+      setState({
+        session_type: "work",
+        remaining_seconds: 1500,
+        is_running: 0,
+        pomodoro_count: 0,
+      });
+      toast({
+        title: "Session reset",
+        description: "Timer reset to beginning. Ready to start fresh!",
+        status: "info",
+        duration: 2000,
+      });
     } catch (error) {
       toast({
         title: "Error resetting timer",
@@ -238,21 +259,21 @@ export default function PomodoroPage() {
       ? "Short Break"
       : "Long Break";
 
-  const bgColor = state.session_type === "work" ? "transparent" : "teal.50";
+  const bgColor = state.session_type === "work" ? pageBg : breakPageBg;
 
   return (
     <Box bg={bgColor} minH="100vh" p={8}>
-      <Heading size="xl" color="text.primary" mb={8}>
+      <Heading size="xl" color={textColor} mb={8}>
         🍅 Pomodoro Timer
       </Heading>
 
       <VStack spacing={8} maxW="600px" mx="auto">
-        <Circle size="300px" bg="white" boxShadow="lg" border="8px solid" borderColor={state.session_type === "work" ? "primary.500" : "teal.500"}>
+        <Circle size="300px" bg={circleBg} boxShadow="lg" border="8px solid" borderColor={state.session_type === "work" ? workBorderColor : breakBorderColor}>
           <VStack>
-            <Text fontSize="6xl" fontWeight="bold" fontFamily="monospace" color="text.primary">
+            <Text fontSize="6xl" fontWeight="bold" fontFamily="monospace" color={textColor}>
               {displayTime}
             </Text>
-            <Text fontSize="xl" color="text.secondary">
+            <Text fontSize="xl" color={secondaryTextColor}>
               {sessionLabel}
             </Text>
           </VStack>
@@ -273,7 +294,7 @@ export default function PomodoroPage() {
           </Button>
         </HStack>
 
-        <Text fontSize="md" color="text.tertiary">
+        <Text fontSize="md" color={secondaryTextColor}>
           Completed: {state.pomodoro_count}/4 Pomodoros
         </Text>
       </VStack>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, VStack, Text, HStack } from "@chakra-ui/react";
+import { Box, VStack, Text, HStack, useColorModeValue } from "@chakra-ui/react";
 import { Link, useLocation } from "react-router-dom";
 import { getRevisionsDueToday } from "../services/database";
 
@@ -15,6 +15,14 @@ export default function Sidebar() {
   const location = useLocation();
   const [dueCount, setDueCount] = useState(0);
 
+  // Dark mode colors
+  const bgColor = useColorModeValue("white", "#1a1a1a");
+  const borderColor = useColorModeValue("gray.200", "#333333");
+  const textColor = useColorModeValue("text.secondary", "#e0e0e0");
+  const hoverBg = useColorModeValue("gray.50", "#252525");
+  const activeBg = useColorModeValue("primary.50", "#2F2F2F");
+  const activeColor = useColorModeValue("primary.500", "#1EA896");
+
   useEffect(() => {
     loadDueCount();
     const interval = setInterval(loadDueCount, 60000); // Update every minute
@@ -29,20 +37,20 @@ export default function Sidebar() {
   return (
     <Box
       w="250px"
-      bg="white"
+      bg={bgColor}
       borderRight="1px solid"
-      borderColor="gray.200"
+      borderColor={borderColor}
       h="100vh"
       position="sticky"
       top="0"
     >
       <VStack spacing={0} align="stretch" h="100%">
         {/* App Logo/Name */}
-        <Box p={6} borderBottom="1px solid" borderColor="gray.200">
+        <Box p={6} borderBottom="1px solid" borderColor={borderColor}>
           <Text
             fontSize="2xl"
             fontWeight="bold"
-            color="primary.500"
+            color={activeColor}
             letterSpacing="tight"
           >
             Recallify
@@ -66,10 +74,10 @@ export default function Sidebar() {
                   px={4}
                   py={3}
                   borderRadius="md"
-                  bg={isActive ? "primary.50" : "transparent"}
-                  color={isActive ? "primary.500" : "text.secondary"}
+                  bg={isActive ? activeBg : "transparent"}
+                  color={isActive ? activeColor : textColor}
                   _hover={{
-                    bg: isActive ? "primary.50" : "gray.50",
+                    bg: isActive ? activeBg : hoverBg,
                   }}
                   cursor="pointer"
                   transition="all 0.2s"
