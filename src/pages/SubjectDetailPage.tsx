@@ -37,6 +37,7 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { format } from "date-fns";
 import {
@@ -52,12 +53,16 @@ import {
   getSettings,
   linkTagsToEntry,
   getEntryTags,
+  updateDailyActivity,
+  calculateStreaks,
+  checkAndRecordMilestone,
+  markMilestoneShown,
 } from "../services/database";
 import { Subject, EntryWithDetails } from "../types";
 import { useRef } from "react";
 import SyllabusTab from "../components/SyllabusTab";
 import RichTextEditor from "../components/RichTextEditor";
-import PdfManager from "../components/PdfManager";
+import CelebrationModal from "../components/CelebrationModal";
 import { getPreviewText } from "../utils/richTextUtils";
 
 export default function SubjectDetailPage() {
@@ -93,9 +98,22 @@ export default function SubjectDetailPage() {
     onOpen: onDeleteSubjectOpen,
     onClose: onDeleteSubjectClose,
   } = useDisclosure();
+  const {
+    isOpen: isCelebrationOpen,
+    onOpen: onCelebrationOpen,
+    onClose: onCelebrationClose,
+  } = useDisclosure();
+  const [celebrationMilestone, setCelebrationMilestone] = useState<number | null>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
 
   const toast = useToast();
+
+  // Dark mode colors
+  const cardBg = useColorModeValue("white", "#1a1a1a");
+  const borderColor = useColorModeValue("gray.200", "#2d2d2d");
+  const textColor = useColorModeValue("text.primary", "#ffffff");
+  const secondaryTextColor = useColorModeValue("text.secondary", "#b0b0b0");
+  const tertiaryTextColor = useColorModeValue("text.tertiary", "#808080");
 
   useEffect(() => {
     if (id) {
@@ -220,6 +238,19 @@ export default function SubjectDetailPage() {
       } else {
         const newEntry = await createEntry(Number(id), studyDate, studyNotes, intervals, topics);
         entryId = newEntry.id;
+
+        // Check for milestone celebration after creating new entry
+        const today = format(new Date(), "yyyy-MM-dd");
+        await updateDailyActivity(today);
+        const streaks = await calculateStreaks();
+        const milestoneCheck = await checkAndRecordMilestone(streaks.currentStreak);
+
+        if (milestoneCheck && milestoneCheck.shouldCelebrate) {
+          // Show celebration modal
+          setCelebrationMilestone(milestoneCheck.milestone);
+          onCelebrationOpen();
+        }
+
         toast({
           title: "Entry created",
           status: "success",
@@ -484,12 +515,12 @@ export default function SubjectDetailPage() {
                 textAlign="center"
                 py={16}
                 px={4}
-                bg="white"
+                bg={cardBg}
                 borderRadius="md"
                 border="2px dashed"
-                borderColor="gray.200"
+                borderColor={borderColor}
               >
-                <Text fontSize="lg" color="text.tertiary" mb={4}>
+                <Text fontSize="lg" color={tertiaryTextColor} mb={4}>
                   No study entries yet. Add your first entry!
                 </Text>
                 <Button onClick={openNewEntryModal}>Create Entry</Button>
@@ -501,10 +532,11 @@ export default function SubjectDetailPage() {
                     key={entry.id}
                     cursor="pointer"
                     onClick={() => openEditEntryModal(entry)}
+                    bg={cardBg}
                   >
                     <CardBody>
                       <HStack justify="space-between" mb={2}>
-                        <Text fontWeight="semibold" color="text.primary">
+                        <Text fontWeight="semibold" color={textColor}>
                           {format(new Date(entry.study_date), "MMM dd, yyyy")}
                         </Text>
                         <HStack>
@@ -529,11 +561,11 @@ export default function SubjectDetailPage() {
                         </HStack>
                       </HStack>
                       {(entry as any).topics ? (
-                        <Text color="text.secondary" noOfLines={2} fontWeight="medium">
+                        <Text color={secondaryTextColor} noOfLines={2} fontWeight="medium">
                           Topics: {(entry as any).topics}
                         </Text>
                       ) : (
-                        <Text color="text.tertiary" noOfLines={2} fontSize="sm" fontStyle="italic">
+                        <Text color={tertiaryTextColor} noOfLines={2} fontSize="sm" fontStyle="italic">
                           No topics specified
                         </Text>
                       )}
@@ -555,7 +587,7 @@ export default function SubjectDetailPage() {
                         <Text
                           mt={2}
                           fontSize="sm"
-                          color="text.tertiary"
+                          color={tertiaryTextColor}
                           fontStyle="italic"
                         >
                           Morning recall: {getPreviewText(entry.morning_recall_notes, 100)}
@@ -578,22 +610,22 @@ export default function SubjectDetailPage() {
                 textAlign="center"
                 py={16}
                 px={4}
-                bg="white"
+                bg={cardBg}
                 borderRadius="md"
               >
-                <Text fontSize="lg" color="text.tertiary">
+                <Text fontSize="lg" color={tertiaryTextColor}>
                   No revisions due today. Great job! 🎉
                 </Text>
               </Box>
             ) : (
               <VStack spacing={4} align="stretch">
                 {dueRevisions.map((revision) => (
-                  <Card key={revision.id}>
+                  <Card key={revision.id} bg={cardBg}>
                     <CardBody>
                       <HStack justify="space-between" align="start">
                         <VStack align="start" flex="1" spacing={2}>
                           <HStack>
-                            <Text fontWeight="semibold" color="text.primary">
+                            <Text fontWeight="semibold" color={textColor}>
                               Day {revision.interval_days} Revision
                             </Text>
                             <Badge
@@ -609,21 +641,21 @@ export default function SubjectDetailPage() {
                                 : "Due Today"}
                             </Badge>
                           </HStack>
-                          <Text color="text.secondary">
+                          <Text color={secondaryTextColor}>
                             {getPreviewText(revision.entry.study_notes, 200)}
                           </Text>
                           {revision.entry.morning_recall_notes && (
                             <Box
                               mt={2}
                               p={3}
-                              bg="gray.50"
+                              bg={useColorModeValue("gray.50", "#252525")}
                               borderRadius="md"
                               w="100%"
                             >
-                              <Text fontSize="sm" fontWeight="semibold" mb={1}>
+                              <Text fontSize="sm" fontWeight="semibold" mb={1} color={textColor}>
                                 Morning Recall Notes:
                               </Text>
-                              <Text fontSize="sm" color="text.tertiary">
+                              <Text fontSize="sm" color={tertiaryTextColor}>
                                 {getPreviewText(revision.entry.morning_recall_notes, 300)}
                               </Text>
                             </Box>
@@ -744,15 +776,6 @@ export default function SubjectDetailPage() {
                   ))}
                 </HStack>
               </FormControl>
-
-              {isEditing && selectedEntry && (
-                <Box pt={4} borderTop="1px solid" borderColor="gray.200">
-                  <PdfManager
-                    entryId={selectedEntry.id}
-                    onUpdate={loadSubjectData}
-                  />
-                </Box>
-              )}
             </VStack>
           </ModalBody>
           <ModalFooter>
@@ -819,6 +842,19 @@ export default function SubjectDetailPage() {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
+
+      {/* Milestone Celebration Modal */}
+      <CelebrationModal
+        isOpen={isCelebrationOpen}
+        milestone={celebrationMilestone}
+        onClose={async () => {
+          if (celebrationMilestone) {
+            await markMilestoneShown(celebrationMilestone);
+          }
+          setCelebrationMilestone(null);
+          onCelebrationClose();
+        }}
+      />
     </Box>
   );
 }

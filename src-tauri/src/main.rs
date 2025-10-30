@@ -231,6 +231,36 @@ fn init_database(conn: &Connection) -> Result<()> {
         "ALTER TABLE entries ADD COLUMN topics TEXT",
         [],
     );
+
+    // v3.2 Migration: Add daily_activity table for streak tracking
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS daily_activity (
+            activity_date DATE PRIMARY KEY,
+            study_minutes INTEGER DEFAULT 0,
+            pomodoro_count INTEGER DEFAULT 0,
+            entry_count INTEGER DEFAULT 0,
+            subjects_studied TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_daily_activity_date ON daily_activity(activity_date)",
+        [],
+    )?;
+
+    // v3.2 Migration: Add milestone_celebrations table
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS milestone_celebrations (
+            milestone_days INTEGER PRIMARY KEY,
+            achieved_at TIMESTAMP NOT NULL,
+            celebration_shown INTEGER DEFAULT 0,
+            shown_at TIMESTAMP
+        )",
+        [],
+    )?;
+
     conn.execute(
         "INSERT OR IGNORE INTO settings (key, value) VALUES ('pomodoro_sound_enabled', 'true')",
         [],
