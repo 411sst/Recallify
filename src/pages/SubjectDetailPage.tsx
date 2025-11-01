@@ -50,6 +50,8 @@ import {
   completeRevision,
   uncompleteRevision,
   getSettings,
+  linkTagsToEntry,
+  getEntryTags,
 } from "../services/database";
 import { Subject, EntryWithDetails } from "../types";
 import { useRef } from "react";
@@ -74,6 +76,7 @@ export default function SubjectDetailPage() {
   // Form state
   const [studyDate, setStudyDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [topics, setTopics] = useState("");
+  const [tags, setTags] = useState("");
   const [studyNotes, setStudyNotes] = useState("");
   const [morningRecallNotes, setMorningRecallNotes] = useState("");
   const [intervals, setIntervals] = useState<number[]>([3, 7]);
@@ -108,7 +111,21 @@ export default function SubjectDetailPage() {
       setSubjectName(subjectData.name);
 
       const entriesData = await getEntriesBySubject(Number(id));
-      setEntries(entriesData);
+
+      // Load tags for each entry
+      const entriesWithTags = await Promise.all(
+        entriesData.map(async (entry) => {
+          try {
+            const tags = await getEntryTags(entry.id);
+            return { ...entry, tags };
+          } catch (error) {
+            console.error(`Error loading tags for entry ${entry.id}:`, error);
+            return { ...entry, tags: [] };
+          }
+        })
+      );
+
+      setEntries(entriesWithTags);
 
       // Load default intervals
       const settings = await getSettings();
@@ -127,23 +144,23 @@ export default function SubjectDetailPage() {
     }
   }
 
-  function openNewEntryModal() {
+  async function openNewEntryModal() {
     setSelectedEntry(null);
     setIsEditing(false);
     setStudyDate(format(new Date(), "yyyy-MM-dd"));
     setTopics("");
+    setTags("");
     setStudyNotes("");
     setMorningRecallNotes("");
     // Reset to default intervals
-    getSettings().then((settings) => {
-      if (settings.default_intervals) {
-        setIntervals(settings.default_intervals.split(",").map(Number));
-      }
-    });
+    const settings = await getSettings();
+    if (settings.default_intervals) {
+      setIntervals(settings.default_intervals.split(",").map(Number));
+    }
     onOpen();
   }
 
-  function openEditEntryModal(entry: EntryWithDetails) {
+  async function openEditEntryModal(entry: EntryWithDetails) {
     setSelectedEntry(entry);
     setIsEditing(true);
     setStudyDate(entry.study_date);
@@ -151,6 +168,16 @@ export default function SubjectDetailPage() {
     setStudyNotes(entry.study_notes);
     setMorningRecallNotes(entry.morning_recall_notes || "");
     setIntervals(entry.intervals.map((i) => i.interval_days));
+
+    // Load tags for this entry
+    try {
+      const entryTags = await getEntryTags(entry.id);
+      setTags(entryTags.map((t: any) => t.name).join(", "));
+    } catch (error) {
+      console.error("Error loading tags:", error);
+      setTags("");
+    }
+
     onOpen();
   }
 
@@ -174,6 +201,8 @@ export default function SubjectDetailPage() {
     }
 
     try {
+      let entryId: number;
+
       if (isEditing && selectedEntry) {
         await updateEntry(
           selectedEntry.id,
@@ -182,19 +211,30 @@ export default function SubjectDetailPage() {
           intervals,
           topics
         );
+        entryId = selectedEntry.id;
         toast({
           title: "Entry updated",
           status: "success",
           duration: 3000,
         });
       } else {
-        await createEntry(Number(id), studyDate, studyNotes, intervals, topics);
+        const newEntry = await createEntry(Number(id), studyDate, studyNotes, intervals, topics);
+        entryId = newEntry.id;
         toast({
           title: "Entry created",
           status: "success",
           duration: 3000,
         });
       }
+
+      // Link tags to entry
+      if (tags.trim()) {
+        const tagNames = tags.split(",").map((t) => t.trim()).filter((t) => t);
+        await linkTagsToEntry(entryId, tagNames);
+      } else {
+        await linkTagsToEntry(entryId, []);
+      }
+
       onClose();
       loadSubjectData();
     } catch (error) {
@@ -497,6 +537,20 @@ export default function SubjectDetailPage() {
                           No topics specified
                         </Text>
                       )}
+                      {(entry as any).tags && (entry as any).tags.length > 0 && (
+                        <HStack mt={2} spacing={2} flexWrap="wrap">
+                          {(entry as any).tags.map((tag: any) => (
+                            <Tag
+                              key={tag.id}
+                              size="sm"
+                              colorScheme="blue"
+                              borderRadius="full"
+                            >
+                              {tag.name}
+                            </Tag>
+                          ))}
+                        </HStack>
+                      )}
                       {entry.morning_recall_notes && (
                         <Text
                           mt={2}
@@ -625,6 +679,18 @@ export default function SubjectDetailPage() {
                 />
                 <Text fontSize="xs" color="text.tertiary" mt={1}>
                   💡 Enter topics separated by commas or line breaks
+                </Text>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel>Tags 🏷️</FormLabel>
+                <Input
+                  placeholder="difficult, review-needed, practice-more"
+                  value={tags}
+                  onChange={(e) => setTags(e.target.value)}
+                />
+                <Text fontSize="xs" color="text.tertiary" mt={1}>
+                  💡 Add tags to categorize and find entries easily (comma-separated)
                 </Text>
               </FormControl>
 
