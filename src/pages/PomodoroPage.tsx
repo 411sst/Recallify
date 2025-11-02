@@ -238,6 +238,14 @@ export default function PomodoroPage() {
 
   async function completeSession() {
     try {
+      // CRITICAL: Stop the timer FIRST to prevent infinite loop
+      // This prevents tick() from calling completeSession() repeatedly
+      await invoke("db_execute", {
+        sql: "UPDATE pomodoro_state SET is_running = 0 WHERE id = 1",
+        params: [],
+      });
+      setState((prev) => ({ ...prev, is_running: 0 }));
+
       // Play sound (simplified)
       playSound();
 
