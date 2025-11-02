@@ -227,7 +227,19 @@ Recallify is a desktop application that combines scientifically-backed spaced re
    npm install
    ```
 
-3. **Run in development mode:**
+3. **Set up Spotify integration (Optional):**
+   - Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+   - Create a new app
+   - Add redirect URI: `http://127.0.0.1:1420/spotify-callback`
+   - Copy your Client ID and Client Secret
+   - Create a `.env` file in the project root:
+     ```bash
+     VITE_SPOTIFY_CLIENT_ID=your_client_id_here
+     VITE_SPOTIFY_CLIENT_SECRET=your_client_secret_here
+     ```
+   - **Note:** Spotify Premium is required for playback features
+
+4. **Run in development mode:**
    ```bash
    npm run tauri:dev
    ```

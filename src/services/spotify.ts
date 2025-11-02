@@ -1,9 +1,9 @@
 import { invoke } from "@tauri-apps/api/tauri";
 
-// IMPORTANT: Replace these with your actual Spotify App credentials
-// Get them from: https://developer.spotify.com/dashboard
-const SPOTIFY_CLIENT_ID = "2a069871dadb460d8851bc0c97ff6bfe";
-const SPOTIFY_CLIENT_SECRET = "05a32400b6224da589ea9be390950a16";
+// IMPORTANT: Set these in your .env file
+// Get credentials from: https://developer.spotify.com/dashboard
+const SPOTIFY_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || "";
+const SPOTIFY_CLIENT_SECRET = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET || "";
 // Spotify requires 127.0.0.1 (doesn't allow localhost), but Tauri works better with localhost
 // So we use 127.0.0.1 for Spotify OAuth, but the app runs on localhost
 const REDIRECT_URI = "http://127.0.0.1:1420/spotify-callback";
