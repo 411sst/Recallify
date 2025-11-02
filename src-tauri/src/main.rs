@@ -282,6 +282,24 @@ fn init_database(conn: &Connection) -> Result<()> {
         [],
     )?;
 
+    // v3.3 Migration: Add spotify_auth table for music integration
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS spotify_auth (
+            id INTEGER PRIMARY KEY CHECK(id = 1),
+            access_token TEXT NOT NULL,
+            refresh_token TEXT NOT NULL,
+            expires_at TIMESTAMP NOT NULL,
+            device_id TEXT,
+            last_playlist_uri TEXT,
+            last_track_uri TEXT,
+            last_position_ms INTEGER DEFAULT 0,
+            is_premium INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )",
+        [],
+    )?;
+
     Ok(())
 }
 
@@ -436,6 +454,90 @@ fn delete_pdf_file(file_path: String) -> Result<(), String> {
         .map_err(|e| format!("Failed to delete PDF file: {}", e))
 }
 
+// Spotify Authentication Commands
+#[tauri::command]
+fn spotify_get_auth() -> Result<Option<serde_json::Value>, String> {
+    let db = DB.lock().map_err(|e| e.to_string())?;
+    
+    let result = db.query_row(
+        "SELECT access_token, refresh_token, expires_at, device_id, last_playlist_uri, last_track_uri, last_position_ms, is_premium FROM spotify_auth WHERE id = 1",
+        [],
+        |row| {
+            Ok(serde_json::json!({
+                "accessToken": row.get::<_, String>(0)?,
+                "refreshToken": row.get::<_, String>(1)?,
+                "expiresAt": row.get::<_, String>(2)?,
+                "deviceId": row.get::<_, Option<String>>(3)?,
+                "lastPlaylistUri": row.get::<_, Option<String>>(4)?,
+                "lastTrackUri": row.get::<_, Option<String>>(5)?,
+                "lastPositionMs": row.get::<_, i64>(6)?,
+                "isPremium": row.get::<_, i64>(7)?
+            }))
+        }
+    );
+
+    match result {
+        Ok(data) => Ok(Some(data)),
+        Err(rusqlite::Error::QueryReturnedNoRows) => Ok(None),
+        Err(e) => Err(e.to_string())
+    }
+}
+
+#[tauri::command]
+fn spotify_save_auth(
+    access_token: String,
+    refresh_token: String,
+    expires_at: String,
+    is_premium: i64
+) -> Result<(), String> {
+    let db = DB.lock().map_err(|e| e.to_string())?;
+    
+    db.execute(
+        "INSERT OR REPLACE INTO spotify_auth (id, access_token, refresh_token, expires_at, is_premium, updated_at) VALUES (1, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
+        &[&access_token, &refresh_token, &expires_at, &is_premium.to_string()]
+    ).map_err(|e| e.to_string())?;
+    
+    Ok(())
+}
+
+#[tauri::command]
+fn spotify_update_device(device_id: String) -> Result<(), String> {
+    let db = DB.lock().map_err(|e| e.to_string())?;
+    
+    db.execute(
+        "UPDATE spotify_auth SET device_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1",
+        &[&device_id]
+    ).map_err(|e| e.to_string())?;
+    
+    Ok(())
+}
+
+#[tauri::command]
+fn spotify_save_playback_state(
+    playlist_uri: Option<String>,
+    track_uri: Option<String>,
+    position_ms: i64
+) -> Result<(), String> {
+    let db = DB.lock().map_err(|e| e.to_string())?;
+    
+    db.execute(
+        "UPDATE spotify_auth SET last_playlist_uri = ?, last_track_uri = ?, last_position_ms = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1",
+        rusqlite::params![playlist_uri, track_uri, position_ms]
+    ).map_err(|e| e.to_string())?;
+    
+    Ok(())
+}
+
+#[tauri::command]
+fn spotify_logout() -> Result<(), String> {
+    let db = DB.lock().map_err(|e| e.to_string())?;
+    
+    db.execute("DELETE FROM spotify_auth WHERE id = 1", [])
+        .map_err(|e| e.to_string())?;
+    
+    Ok(())
+}
+
 fn main() {
     // Initialize database at startup
     drop(DB.lock());
@@ -446,7 +548,12 @@ fn main() {
             db_select,
             read_pdf_file,
             save_pdf_file,
-            delete_pdf_file
+            delete_pdf_file,
+            spotify_get_auth,
+            spotify_save_auth,
+            spotify_update_device,
+            spotify_save_playback_state,
+            spotify_logout
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
