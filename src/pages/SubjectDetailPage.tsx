@@ -209,15 +209,6 @@ export default function SubjectDetailPage() {
       return;
     }
 
-    if (intervals.length === 0) {
-      toast({
-        title: "At least one interval required",
-        status: "warning",
-        duration: 3000,
-      });
-      return;
-    }
-
     try {
       let entryId: number;
 
@@ -747,7 +738,10 @@ export default function SubjectDetailPage() {
               </FormControl>
 
               <FormControl>
-                <FormLabel>Revision Intervals (days)</FormLabel>
+                <FormLabel>Revision Intervals (days) - Optional</FormLabel>
+                <Text fontSize="xs" color="text.tertiary" mb={2}>
+                  💡 Add revision intervals for spaced repetition. Leave empty if no revision needed.
+                </Text>
                 <HStack mb={2}>
                   <Input
                     type="number"
