@@ -1,6 +1,6 @@
 [package]
 name = "recallify"
-version = "1.0.0"
+version = "4.0.0"
 description = "A desktop application for optimized learning through spaced repetition"
 authors = ["you"]
 edition = "2021"

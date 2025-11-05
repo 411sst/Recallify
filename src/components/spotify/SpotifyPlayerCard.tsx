@@ -248,7 +248,7 @@ export default function SpotifyPlayerCard({ onClose }: SpotifyPlayerCardProps) {
                 Login with Spotify
               </Button>
               <Text fontSize="xs" color={secondaryTextColor} textAlign="center">
-                Requires Spotify Premium
+                Requires Spotify Premium. After clicking, authorize in your browser and copy the code.
               </Text>
             </>
           ) : (
