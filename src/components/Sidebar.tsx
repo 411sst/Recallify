@@ -34,7 +34,7 @@ export default function Sidebar() {
 
   useEffect(() => {
     loadDueCount();
-    const interval = setInterval(loadDueCount, 60000); // Update every minute
+    const interval = setInterval(loadDueCount, 3000); // Update every 3 seconds for near-instant updates
     return () => clearInterval(interval);
   }, []);
 

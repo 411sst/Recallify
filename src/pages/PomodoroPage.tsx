@@ -386,6 +386,19 @@ export default function PomodoroPage() {
     onClose();
   }
 
+  async function skipBreak() {
+    // Skip any break (short or long) and start work session
+    setAutoStartCountdown(0);
+    setNextSessionType(null);
+    onAutoStartClose();
+    await transitionToWork();
+    if (selectedSubjectId) {
+      await startTimer();
+    } else {
+      onSubjectSelectOpen();
+    }
+  }
+
   function playSound() {
     try {
       const audio = new Audio("/timer-complete.mp3");
@@ -443,6 +456,11 @@ export default function PomodoroPage() {
           ) : (
             <Button onClick={pauseTimer} size="lg" px={12} colorScheme="orange">
               Pause
+            </Button>
+          )}
+          {state.session_type !== "work" && (
+            <Button onClick={skipBreak} variant="outline" size="lg" colorScheme="orange">
+              Skip Break
             </Button>
           )}
           <Button onClick={resetTimer} variant="outline" size="lg">
@@ -516,6 +534,15 @@ export default function PomodoroPage() {
             >
               Cancel Auto-Start
             </Button>
+            {nextSessionType === "short_break" && (
+              <Button
+                colorScheme="orange"
+                onClick={skipBreak}
+                size="lg"
+              >
+                Skip Break
+              </Button>
+            )}
             <Button
               colorScheme="teal"
               onClick={() => {
