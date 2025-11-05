@@ -300,9 +300,15 @@ export default function CalendarPage() {
                             }
                           />
                         </HStack>
-                        <Text fontSize="sm" color="text.secondary" noOfLines={2}>
-                          {revision.entry.study_notes}
-                        </Text>
+                        {(revision.entry as any).topics ? (
+                          <Text fontSize="sm" color="text.secondary" noOfLines={2}>
+                            Topics: {(revision.entry as any).topics}
+                          </Text>
+                        ) : (
+                          <Text fontSize="sm" color="text.tertiary" fontStyle="italic" noOfLines={1}>
+                            No topics specified
+                          </Text>
+                        )}
                         <Badge
                           mt={2}
                           colorScheme={

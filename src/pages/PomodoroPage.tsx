@@ -23,7 +23,7 @@ import {
 import { invoke } from "@tauri-apps/api/tauri";
 import { sendNotification } from "@tauri-apps/api/notification";
 import { format } from "date-fns";
-import { updateDailyActivity, calculateStreaks, checkAndRecordMilestone, markMilestoneShown } from "../services/database";
+import { updateDailyActivity, calculateStreaks, checkAndRecordMilestone, markMilestoneShown, getTodayPomodoroSummary } from "../services/database";
 import CelebrationModal from "../components/CelebrationModal";
 
 interface PomodoroState {
@@ -46,6 +46,11 @@ export default function PomodoroPage() {
   const [subjects, setSubjects] = useState<any[]>([]);
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
   const [selectedSubjectName, setSelectedSubjectName] = useState<string>("");
+  const [sessionSummary, setSessionSummary] = useState<{
+    totalPomodoros: number;
+    totalMinutes: number;
+    subjectsStudied: string[];
+  } | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isAutoStartOpen,
@@ -262,6 +267,11 @@ export default function PomodoroPage() {
       if (isWorkComplete) {
         const today = format(new Date(), "yyyy-MM-dd");
         await updateDailyActivity(today);
+
+        // Get session summary
+        const summary = await getTodayPomodoroSummary();
+        setSessionSummary(summary);
+
         const streaks = await calculateStreaks();
         const milestoneCheck = await checkAndRecordMilestone(streaks.currentStreak);
 
@@ -386,6 +396,19 @@ export default function PomodoroPage() {
     onClose();
   }
 
+  async function skipBreak() {
+    // Skip any break (short or long) and start work session
+    setAutoStartCountdown(0);
+    setNextSessionType(null);
+    onAutoStartClose();
+    await transitionToWork();
+    if (selectedSubjectId) {
+      await startTimer();
+    } else {
+      onSubjectSelectOpen();
+    }
+  }
+
   function playSound() {
     try {
       const audio = new Audio("/timer-complete.mp3");
@@ -445,6 +468,11 @@ export default function PomodoroPage() {
               Pause
             </Button>
           )}
+          {state.session_type !== "work" && (
+            <Button onClick={skipBreak} variant="outline" size="lg" colorScheme="orange">
+              Skip Break
+            </Button>
+          )}
           <Button onClick={resetTimer} variant="outline" size="lg">
             Reset
           </Button>
@@ -476,7 +504,7 @@ export default function PomodoroPage() {
       </Modal>
 
       {/* Auto-Start Modal */}
-      <Modal isOpen={isAutoStartOpen} onClose={handleCancelAutoStart} isCentered>
+      <Modal isOpen={isAutoStartOpen} onClose={handleCancelAutoStart} isCentered size="lg">
         <ModalOverlay bg="blackAlpha.700" />
         <ModalContent>
           <ModalHeader textAlign="center">
@@ -484,11 +512,59 @@ export default function PomodoroPage() {
           </ModalHeader>
           <ModalBody>
             <VStack spacing={6}>
-              <Text fontSize="lg" textAlign="center">
-                {state.session_type === "work"
-                  ? "🎉 Great work! You completed 25 minutes."
-                  : "Ready to focus?"}
-              </Text>
+              {state.session_type === "work" && sessionSummary && (
+                <Box
+                  p={4}
+                  bg={useColorModeValue("green.50", "rgba(72, 187, 120, 0.1)")}
+                  borderRadius="md"
+                  w="100%"
+                  borderLeft="4px solid"
+                  borderColor="green.500"
+                >
+                  <VStack spacing={3} align="start">
+                    <Text fontSize="lg" fontWeight="bold" color={textColor}>
+                      🎉 Great work! You studied {selectedSubjectName} for 25 minutes.
+                    </Text>
+                    <Box w="100%">
+                      <Text fontSize="sm" color={secondaryTextColor} mb={2}>
+                        📊 Today's Progress:
+                      </Text>
+                      <HStack spacing={6}>
+                        <VStack align="start" spacing={0}>
+                          <Text fontSize="2xl" fontWeight="bold" color="primary.500">
+                            {sessionSummary.totalPomodoros}
+                          </Text>
+                          <Text fontSize="xs" color={secondaryTextColor}>
+                            Pomodoros
+                          </Text>
+                        </VStack>
+                        <VStack align="start" spacing={0}>
+                          <Text fontSize="2xl" fontWeight="bold" color="primary.500">
+                            {sessionSummary.totalMinutes}
+                          </Text>
+                          <Text fontSize="xs" color={secondaryTextColor}>
+                            Minutes
+                          </Text>
+                        </VStack>
+                        <VStack align="start" spacing={0}>
+                          <Text fontSize="2xl" fontWeight="bold" color="primary.500">
+                            {sessionSummary.subjectsStudied.length}
+                          </Text>
+                          <Text fontSize="xs" color={secondaryTextColor}>
+                            Subjects
+                          </Text>
+                        </VStack>
+                      </HStack>
+                    </Box>
+                  </VStack>
+                </Box>
+              )}
+
+              {state.session_type !== "work" && (
+                <Text fontSize="lg" textAlign="center">
+                  Ready to focus?
+                </Text>
+              )}
 
               <Box textAlign="center">
                 <Text fontSize="6xl" fontWeight="bold" color="primary.500">
@@ -516,6 +592,15 @@ export default function PomodoroPage() {
             >
               Cancel Auto-Start
             </Button>
+            {nextSessionType === "short_break" && (
+              <Button
+                colorScheme="orange"
+                onClick={skipBreak}
+                size="lg"
+              >
+                Skip Break
+              </Button>
+            )}
             <Button
               colorScheme="teal"
               onClick={() => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Box, VStack, Text, HStack, useColorModeValue, IconButton, Tooltip } from "@chakra-ui/react";
 import { Link, useLocation } from "react-router-dom";
 import { getRevisionsDueToday } from "../services/database";
@@ -23,6 +23,8 @@ export default function Sidebar() {
     const saved = localStorage.getItem("sidebarCollapsed");
     return saved === "true";
   });
+  const isLoadingRef = useRef(false);
+  const lastLoadTimeRef = useRef<number>(0);
 
   // Dark mode colors
   const bgColor = useColorModeValue("white", "#1a1a1a");
@@ -32,11 +34,58 @@ export default function Sidebar() {
   const activeBg = useColorModeValue("primary.50", "#2F2F2F");
   const activeColor = useColorModeValue("primary.500", "#1EA896");
 
+  // Memoized load function with debouncing
+  const loadDueCount = useCallback(async () => {
+    // Prevent concurrent loads
+    if (isLoadingRef.current) return;
+
+    // Debounce: Don't load if we loaded less than 2 seconds ago
+    const now = Date.now();
+    if (now - lastLoadTimeRef.current < 2000) return;
+
+    try {
+      isLoadingRef.current = true;
+      lastLoadTimeRef.current = now;
+      const revisions = await getRevisionsDueToday();
+      setDueCount(revisions.length);
+    } finally {
+      isLoadingRef.current = false;
+    }
+  }, []);
+
+  // Initial load and periodic refresh
   useEffect(() => {
     loadDueCount();
-    const interval = setInterval(loadDueCount, 60000); // Update every minute
-    return () => clearInterval(interval);
-  }, []);
+
+    // Refresh every 10 seconds when page is visible
+    // Refresh every 60 seconds when page is hidden
+    let interval: NodeJS.Timeout;
+
+    const handleVisibilityChange = () => {
+      clearInterval(interval);
+      const refreshInterval = document.hidden ? 60000 : 10000;
+      interval = setInterval(loadDueCount, refreshInterval);
+    };
+
+    // Set initial interval
+    interval = setInterval(loadDueCount, 10000);
+
+    // Listen for visibility changes
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [loadDueCount]);
+
+  // Reload when navigating to certain pages
+  useEffect(() => {
+    // Refresh count when visiting pages where revisions might change
+    if (location.pathname.startsWith('/subjects/') || location.pathname === '/calendar') {
+      loadDueCount();
+    }
+  }, [location.pathname, loadDueCount]);
 
   // Keyboard shortcut: Ctrl/Cmd + B
   useEffect(() => {
@@ -50,11 +99,6 @@ export default function Sidebar() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isCollapsed]);
-
-  async function loadDueCount() {
-    const revisions = await getRevisionsDueToday();
-    setDueCount(revisions.length);
-  }
 
   function toggleCollapse() {
     const newState = !isCollapsed;
