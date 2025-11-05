@@ -28,6 +28,8 @@ import {
   FaVolumeUp,
   FaListUl,
   FaTimes,
+  FaChevronDown,
+  FaChevronUp,
 } from "react-icons/fa";
 import { open } from "@tauri-apps/api/shell";
 import { useSpotifyPlayer } from "../../hooks/useSpotifyPlayer";
@@ -52,6 +54,7 @@ export default function SpotifyPlayerCard({ onClose }: SpotifyPlayerCardProps) {
   const [manualCode, setManualCode] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const {
     deviceId,
@@ -386,6 +389,73 @@ export default function SpotifyPlayerCard({ onClose }: SpotifyPlayerCardProps) {
     );
   }
 
+  // Minimized view
+  if (isMinimized) {
+    return (
+      <Box
+        position="fixed"
+        bottom="80px"
+        right="16px"
+        width="340px"
+        bg={cardBg}
+        borderRadius="16px"
+        boxShadow="0 8px 32px rgba(0,0,0,0.2)"
+        border="1px solid"
+        borderColor={borderColor}
+        overflow="hidden"
+        zIndex={999}
+      >
+        <HStack p={3} spacing={3}>
+          {currentTrack && (
+            <>
+              <Image
+                src={currentTrack.album.images[0]?.url || "/placeholder-album.png"}
+                alt={currentTrack.album.name}
+                boxSize="48px"
+                borderRadius="8px"
+                objectFit="cover"
+              />
+              <VStack align="start" spacing={0} flex={1}>
+                <Text fontSize="sm" fontWeight="bold" color={textColor} noOfLines={1}>
+                  {currentTrack.name}
+                </Text>
+                <Text fontSize="xs" color={secondaryTextColor} noOfLines={1}>
+                  {currentTrack.artists.map((a) => a.name).join(", ")}
+                </Text>
+              </VStack>
+            </>
+          )}
+          <HStack spacing={1}>
+            <IconButton
+              aria-label={isPaused ? "Play" : "Pause"}
+              icon={<Icon as={isPaused ? FaPlay : FaPause} />}
+              size="sm"
+              variant="ghost"
+              onClick={togglePlay}
+              color={textColor}
+            />
+            <IconButton
+              aria-label="Expand"
+              icon={<Icon as={FaChevronUp} />}
+              size="sm"
+              variant="ghost"
+              onClick={() => setIsMinimized(false)}
+              color={textColor}
+            />
+            <IconButton
+              aria-label="Close"
+              icon={<Icon as={FaTimes} />}
+              size="sm"
+              variant="ghost"
+              onClick={onClose}
+              color={textColor}
+            />
+          </HStack>
+        </HStack>
+      </Box>
+    );
+  }
+
   return (
     <>
       <Box
@@ -401,18 +471,23 @@ export default function SpotifyPlayerCard({ onClose }: SpotifyPlayerCardProps) {
         overflow="hidden"
         zIndex={999}
       >
-        {/* Close Button */}
-        <IconButton
-          aria-label="Close"
-          icon={<Icon as={FaTimes} />}
-          size="sm"
-          position="absolute"
-          top={2}
-          right={2}
-          onClick={onClose}
-          variant="ghost"
-          zIndex={1}
-        />
+        {/* Minimize and Close Buttons */}
+        <HStack position="absolute" top={2} right={2} spacing={1} zIndex={1}>
+          <IconButton
+            aria-label="Minimize"
+            icon={<Icon as={FaChevronDown} />}
+            size="sm"
+            onClick={() => setIsMinimized(true)}
+            variant="ghost"
+          />
+          <IconButton
+            aria-label="Close"
+            icon={<Icon as={FaTimes} />}
+            size="sm"
+            onClick={onClose}
+            variant="ghost"
+          />
+        </HStack>
 
         <VStack spacing={0} align="stretch">
           {/* Album Art & Track Info */}
