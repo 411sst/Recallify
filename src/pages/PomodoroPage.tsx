@@ -241,6 +241,96 @@ export default function PomodoroPage() {
     }
   }
 
+  async function endSession() {
+    try {
+      // Stop the timer first
+      await invoke("db_execute", {
+        sql: "UPDATE pomodoro_state SET is_running = 0 WHERE id = 1",
+        params: [],
+      });
+      setState((prev) => ({ ...prev, is_running: 0 }));
+
+      // Get the original duration from database
+      const result = await invoke<any[]>("db_select", {
+        sql: "SELECT duration_seconds FROM pomodoro_state WHERE id = 1",
+        params: [],
+      });
+
+      const originalDuration = result[0].duration_seconds;
+      const timeSpent = originalDuration - state.remaining_seconds;
+      const minutesSpent = Math.round(timeSpent / 60);
+
+      // Only save if at least 1 minute was spent
+      if (minutesSpent >= 1) {
+        await invoke("db_execute", {
+          sql: "INSERT INTO pomodoro_sessions (session_type, duration_minutes, subject_id) VALUES (?, ?, ?)",
+          params: [state.session_type, minutesSpent, state.session_type === "work" ? selectedSubjectId : null],
+        });
+
+        // If it was a work session and substantial time was spent (>= 12 minutes, half a pomodoro)
+        // count it as a completed pomodoro
+        if (state.session_type === "work" && minutesSpent >= 12) {
+          const newCount = state.pomodoro_count + 1;
+
+          // Update activity tracking
+          const today = format(new Date(), "yyyy-MM-dd");
+          await updateDailyActivity(today);
+
+          // Get session summary
+          const summary = await getTodayPomodoroSummary();
+          setSessionSummary(summary);
+
+          toast({
+            title: "Session ended",
+            description: `${minutesSpent} minutes of ${selectedSubjectName || 'study'} logged. Counted as a completed pomodoro!`,
+            status: "success",
+            duration: 4000,
+          });
+
+          // Transition to break
+          if (newCount === 4) {
+            onOpen(); // Show long break modal
+          } else {
+            setNextSessionType("short_break");
+            setAutoStartCountdown(5);
+            onAutoStartOpen();
+          }
+        } else {
+          // Just log the time without counting as completed pomodoro
+          toast({
+            title: "Session ended",
+            description: `${minutesSpent} minutes logged${state.session_type === "work" ? ` for ${selectedSubjectName}` : ''}`,
+            status: "success",
+            duration: 3000,
+          });
+
+          // Reset to work mode
+          await transitionToWork();
+          setSelectedSubjectId(null);
+          setSelectedSubjectName("");
+        }
+      } else {
+        // Less than 1 minute, just reset without logging
+        toast({
+          title: "Session ended",
+          description: "Too short to log (< 1 minute)",
+          status: "info",
+          duration: 2000,
+        });
+        await transitionToWork();
+        setSelectedSubjectId(null);
+        setSelectedSubjectName("");
+      }
+    } catch (error) {
+      console.error("Error ending session:", error);
+      toast({
+        title: "Error ending session",
+        status: "error",
+        duration: 3000,
+      });
+    }
+  }
+
   async function completeSession() {
     try {
       // CRITICAL: Stop the timer FIRST to prevent infinite loop
@@ -374,15 +464,16 @@ export default function PomodoroPage() {
   }
 
   async function transitionToWork() {
+    const newCount = state.session_type === "long_break" ? 0 : state.pomodoro_count;
     await invoke("db_execute", {
-      sql: "UPDATE pomodoro_state SET session_type = 'work', remaining_seconds = 1500, duration_seconds = 1500, is_running = 0 WHERE id = 1",
-      params: [],
+      sql: "UPDATE pomodoro_state SET session_type = 'work', remaining_seconds = 1500, duration_seconds = 1500, is_running = 0, pomodoro_count = ? WHERE id = 1",
+      params: [newCount],
     });
     setState({
       session_type: "work",
       remaining_seconds: 1500,
       is_running: 0,
-      pomodoro_count: state.session_type === "long_break" ? 0 : state.pomodoro_count,
+      pomodoro_count: newCount,
     });
   }
 
@@ -471,6 +562,11 @@ export default function PomodoroPage() {
           {state.session_type !== "work" && (
             <Button onClick={skipBreak} variant="outline" size="lg" colorScheme="orange">
               Skip Break
+            </Button>
+          )}
+          {state.remaining_seconds < (state.session_type === "work" ? 1500 : state.session_type === "short_break" ? 300 : longBreakDuration * 60) && (
+            <Button onClick={endSession} variant="outline" size="lg" colorScheme="red">
+              End Session
             </Button>
           )}
           <Button onClick={resetTimer} variant="outline" size="lg">
