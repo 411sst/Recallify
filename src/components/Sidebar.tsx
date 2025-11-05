@@ -59,7 +59,7 @@ export default function Sidebar() {
 
     // Refresh every 10 seconds when page is visible
     // Refresh every 60 seconds when page is hidden
-    let interval: NodeJS.Timeout;
+    let interval: number;
 
     const handleVisibilityChange = () => {
       clearInterval(interval);
