@@ -3,7 +3,7 @@
  * Animated flame SVG with flickering effects
  */
 
-import { Box, keyframes } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { useAnimationQuality } from '../../stores/mythicStore';
 

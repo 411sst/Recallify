@@ -178,15 +178,37 @@ export default function SettingsPage() {
             <Heading size="md" mb={4}>
               Appearance
             </Heading>
-            <FormControl display="flex" alignItems="center">
+
+            {/* Color Mode */}
+            <FormControl display="flex" alignItems="center" mb={4}>
               <FormLabel mb="0" flex="1">
                 Dark Mode
               </FormLabel>
               <Switch colorScheme="primary" isChecked={isDarkMode} onChange={toggleTheme} />
             </FormControl>
-            <Text fontSize="sm" color="text.tertiary" mt={2}>
+            <Text fontSize="sm" color="text.tertiary" mb={4}>
               Reduce eye strain in low-light environments
             </Text>
+
+            <Divider mb={4} />
+
+            {/* Theme Selector */}
+            <FormControl>
+              <FormLabel>Color Theme</FormLabel>
+              <Select
+                value={currentTheme}
+                onChange={(e) => setTheme(e.target.value as any)}
+                size="md"
+              >
+                <option value="default">Default (Green)</option>
+                <option value="kitsune-autumn">🦊 Kitsune Autumn (Orange)</option>
+                <option value="phoenix-inferno">🔥 Phoenix Inferno (Red)</option>
+                <option value="anansi-twilight">🕷️ Anansi Twilight (Purple)</option>
+              </Select>
+              <Text fontSize="sm" color="text.tertiary" mt={2}>
+                Change the color palette of the entire app. Works independently of dark mode.
+              </Text>
+            </FormControl>
           </CardBody>
         </Card>
 
@@ -281,32 +303,6 @@ export default function SettingsPage() {
                       />
                     </FormControl>
                   </VStack>
-                </Box>
-
-                <Divider />
-
-                {/* Theme Selector */}
-                <Box>
-                  <Text fontWeight="semibold" mb={2} fontSize="sm" color="text.secondary">
-                    🎨 Mythic Theme
-                  </Text>
-
-                  <FormControl>
-                    <Select
-                      value={currentTheme}
-                      onChange={(e) => setTheme(e.target.value as any)}
-                      colorScheme="purple"
-                      size="sm"
-                    >
-                      <option value="default">Default (Green)</option>
-                      <option value="kitsune-autumn">🦊 Kitsune Autumn (Orange)</option>
-                      <option value="phoenix-inferno">🔥 Phoenix Inferno (Red)</option>
-                      <option value="anansi-twilight">🕷️ Anansi Twilight (Purple)</option>
-                    </Select>
-                    <Text fontSize="xs" color="text.tertiary" mt={1}>
-                      Change the color palette of the entire app
-                    </Text>
-                  </FormControl>
                 </Box>
 
                 <Divider />

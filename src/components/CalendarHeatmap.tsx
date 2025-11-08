@@ -17,12 +17,13 @@ export default function CalendarHeatmap({ activities, monthsToShow = 6 }: Calend
   const cellSize = 12;
   const cellGap = 3;
 
-  const emptyColor = useColorModeValue("#ebedf0", "#161b22");
-  const level0Color = useColorModeValue("#9be9a8", "#0e4429");
-  const level1Color = useColorModeValue("#40c463", "#006d32");
-  const level2Color = useColorModeValue("#30a14e", "#26a641");
-  const level3Color = useColorModeValue("#216e39", "#39d353");
-  const textColor = useColorModeValue("#586069", "#8b949e");
+  // Use theme CSS variables for heatmap colors
+  const emptyColor = "var(--theme-heatmap-none)";
+  const level0Color = "var(--theme-heatmap-low)";
+  const level1Color = "var(--theme-heatmap-medium)";
+  const level2Color = "var(--theme-heatmap-medium)";
+  const level3Color = "var(--theme-heatmap-high)";
+  const textColor = "var(--theme-text-tertiary)";
   const tooltipBg = useColorModeValue("gray.700", "gray.100");
   const tooltipColor = useColorModeValue("white", "gray.800");
 

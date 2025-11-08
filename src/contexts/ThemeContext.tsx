@@ -14,21 +14,22 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { colorMode, setColorMode } = useColorMode();
   const isDarkMode = colorMode === "dark";
-  const { enabled: mythicEnabled, currentTheme } = useMythicStore();
+  const { currentTheme } = useMythicStore();
 
   useEffect(() => {
     loadTheme();
   }, []);
 
-  // Apply mythic theme colors when theme changes
+  // Apply mythic theme colors when theme changes (independent of mythic mode)
   useEffect(() => {
-    if (mythicEnabled && currentTheme) {
-      applyMythicTheme(currentTheme);
+    // Always apply the selected theme, even if mythic mode is off
+    // This allows themes to work as global color palettes
+    if (currentTheme) {
+      applyMythicTheme(currentTheme, isDarkMode);
     } else {
-      // Reset to default theme
-      applyMythicTheme('default');
+      applyMythicTheme('default', isDarkMode);
     }
-  }, [mythicEnabled, currentTheme]);
+  }, [currentTheme, isDarkMode]);
 
   async function loadTheme() {
     try {

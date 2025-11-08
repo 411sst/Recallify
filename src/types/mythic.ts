@@ -172,12 +172,89 @@ export interface MythicEvent {
 export type MythicTheme = 'default' | 'kitsune-autumn' | 'phoenix-inferno' | 'anansi-twilight';
 
 export interface ThemeColors {
+  // Primary brand colors
   primary: string;
   secondary: string;
   accent: string;
-  background: string;
-  text: string;
   glow: string;
+
+  // Light mode colors
+  light: {
+    background: string;      // Main page background
+    cardBg: string;          // Card backgrounds
+    cardHover: string;       // Card hover state
+    border: string;          // Border color
+    text: {
+      primary: string;       // Main text
+      secondary: string;     // Secondary text
+      tertiary: string;      // Muted text
+    };
+    sidebar: {
+      bg: string;            // Sidebar background
+      hover: string;         // Sidebar hover
+      active: string;        // Active item
+      text: string;          // Sidebar text
+    };
+    input: {
+      bg: string;            // Input background
+      border: string;        // Input border
+      borderFocus: string;   // Input focus state
+    };
+    button: {
+      primaryBg: string;     // Primary button
+      primaryText: string;   // Button text
+      primaryHover: string;  // Hover state
+      secondaryBorder: string; // Outline button
+      secondaryHover: string;  // Outline hover
+    };
+  };
+
+  // Dark mode colors
+  dark: {
+    background: string;
+    cardBg: string;
+    cardHover: string;
+    border: string;
+    text: {
+      primary: string;
+      secondary: string;
+      tertiary: string;
+    };
+    sidebar: {
+      bg: string;
+      hover: string;
+      active: string;
+      text: string;
+    };
+    input: {
+      bg: string;
+      border: string;
+      borderFocus: string;
+    };
+    button: {
+      primaryBg: string;
+      primaryText: string;
+      primaryHover: string;
+      secondaryBorder: string;
+      secondaryHover: string;
+    };
+  };
+
+  // Status colors (same for light/dark)
+  status: {
+    success: string;
+    warning: string;
+    error: string;
+    info: string;
+  };
+
+  // Calendar heatmap (intensity levels)
+  heatmap: {
+    none: string;
+    low: string;
+    medium: string;
+    high: string;
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════

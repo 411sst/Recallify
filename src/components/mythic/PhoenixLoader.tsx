@@ -33,10 +33,15 @@ export function PhoenixLoader({
   const [showLoader, setShowLoader] = useState(false);
   const [loadStartTime, setLoadStartTime] = useState<number | null>(null);
 
+  // Animation stage states
+  const [showQuote, setShowQuote] = useState(false);
+
   const bgColor = useColorModeValue('rgba(255, 255, 255, 0.95)', 'rgba(26, 26, 26, 0.95)');
   const textColor = useColorModeValue('gray.700', 'gray.200');
 
-  const MIN_DISPLAY_TIME = 2000; // 2 seconds minimum to see prophecy
+  // Animation timing constants
+  const QUOTE_DELAY = 800;         // Quote appears after flame (0.8s)
+  const TOTAL_MIN_TIME = 3000;     // Total minimum display time (3s)
 
   // Track when loading starts - always track, even if mythic mode is off
   useEffect(() => {
@@ -44,34 +49,55 @@ export function PhoenixLoader({
       setLoadStartTime(Date.now());
       setShowLoader(true);
       setHasCompleted(false);
+      setShowQuote(false);
     }
   }, [isLoading]);
 
-  // Handle loading completion with minimum display time
+  // Stage the animations: Flame → Quote → Confetti
+  useEffect(() => {
+    if (showLoader && isActive) {
+      // Stage 1: Flame is already showing
+
+      // Stage 2: Show quote after flame animation
+      const quoteTimer = setTimeout(() => {
+        setShowQuote(true);
+      }, QUOTE_DELAY);
+
+      return () => clearTimeout(quoteTimer);
+    } else if (showLoader && !isActive) {
+      // If mythic mode is off, show quote immediately
+      setShowQuote(true);
+    }
+  }, [showLoader, isActive]);
+
+  // Handle loading completion with staged confetti
   useEffect(() => {
     if (!isLoading && showLoader && !hasCompleted && loadStartTime) {
       const elapsed = Date.now() - loadStartTime;
-      const remaining = isActive ? Math.max(0, MIN_DISPLAY_TIME - elapsed) : 0;
+      const remaining = isActive ? Math.max(0, TOTAL_MIN_TIME - elapsed) : 0;
 
-      const timer = setTimeout(() => {
-        setHasCompleted(true);
-        setShowLoader(false);
-
-        // ALWAYS trigger confetti when loading completes, regardless of mythic mode
+      const completionTimer = setTimeout(() => {
+        // Stage 3: Trigger confetti before unmounting
         if (showConfetti) {
           triggerRebirthConfetti();
           if (isActive) {
             incrementRebornCount();
           }
         }
-        onLoadComplete?.();
+
+        // Small delay to let confetti start before unmounting
+        setTimeout(() => {
+          setHasCompleted(true);
+          setShowLoader(false);
+          onLoadComplete?.();
+        }, 200);
       }, remaining);
 
-      return () => clearTimeout(timer);
+      return () => clearTimeout(completionTimer);
     }
   }, [isLoading, showLoader, hasCompleted, isActive, showConfetti, incrementRebornCount, onLoadComplete, loadStartTime]);
 
-  // Fallback standard loader when mythic mode is off
+  // Fallback standard loader when mythic mode is off (still show confetti)
   if (!isActive) {
     return (
       <AnimatePresence>
@@ -135,12 +161,12 @@ export function PhoenixLoader({
               <PhoenixFlame size={120} intensity="high" animated={true} />
             </motion.div>
 
-            {/* Prophecy */}
-            {prophecy && (
+            {/* Prophecy - appears after flame */}
+            {prophecy && showQuote && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
               >
                 <Text
                   fontSize="md"
