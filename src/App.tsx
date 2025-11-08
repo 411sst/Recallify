@@ -15,8 +15,12 @@ import SettingsPage from "./pages/SettingsPage";
 import SpotifyCallbackPage from "./pages/SpotifyCallbackPage";
 import SpotifyButton from "./components/spotify/SpotifyButton";
 import { updateOverdueRevisions } from "./services/database";
+import { useMythicSync } from "./hooks/useMythicSync";
 
 function App() {
+  // Initialize mythic mode state syncing (tail counts, etc.)
+  useMythicSync();
+
   useEffect(() => {
     // Update overdue revisions on app launch
     updateOverdueRevisions();

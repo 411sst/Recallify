@@ -1,0 +1,131 @@
+/**
+ * 🌟 MYTHIC MODE TYPE DEFINITIONS
+ * Folklore features for the "Legends Awakened" saga
+ */
+
+// ═══════════════════════════════════════════════════════════════
+// MYTHIC MODE CONFIGURATION
+// ═══════════════════════════════════════════════════════════════
+
+export interface MythicSettings {
+  // Global mythic mode toggle
+  enabled: boolean;
+
+  // Individual feature toggles
+  features: {
+    kitsuneSidebar: boolean;      // 🦊 Fox-fire sidebar transformations
+    phoenixLoaders: boolean;       // 🔥 Rebirth prophecy loading screens
+    anansiWeb: boolean;            // 🕷️ Spider-yarn pomodoro interruptions
+  };
+
+  // Performance settings
+  performance: {
+    animationQuality: 'high' | 'medium' | 'low';  // FPS scaling
+    particlesEnabled: boolean;                     // Particle effects toggle
+    audioEnabled: boolean;                         // Mythic audio toggle
+  };
+
+  // Accessibility
+  accessibility: {
+    reducedMotion: boolean;        // Honor prefers-reduced-motion
+    muteAudio: boolean;            // Silent mode
+    highContrast: boolean;         // Increase visibility
+  };
+}
+
+// Default settings
+export const DEFAULT_MYTHIC_SETTINGS: MythicSettings = {
+  enabled: false,  // Opt-in by default
+  features: {
+    kitsuneSidebar: true,
+    phoenixLoaders: true,
+    anansiWeb: true,
+  },
+  performance: {
+    animationQuality: 'high',
+    particlesEnabled: true,
+    audioEnabled: true,
+  },
+  accessibility: {
+    reducedMotion: false,
+    muteAudio: false,
+    highContrast: false,
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// FOLKLORE CONTENT TYPES
+// ═══════════════════════════════════════════════════════════════
+
+export interface FolkloreTale {
+  id: string;
+  title: string;
+  culture: 'celtic' | 'norse' | 'african' | 'japanese' | 'greek' | 'native-american' | 'arabian';
+  content: string;           // 50-100 word snippet
+  theme: string[];           // Tags: wisdom, memory, patience, etc.
+  tone: 'playful' | 'mysterious' | 'inspiring' | 'challenging';
+}
+
+export interface KitsuneTail {
+  tailCount: number;         // 1-9 based on streak
+  haiku: string;             // Fox-fable haiku hint
+  foxFireColor: string;      // Hex color for preview glow
+  pagePreview: string;       // Page name being previewed
+}
+
+export interface PhoenixProphecy {
+  prophecy: string;          // Flickering flame fortune
+  sessionContext: string;    // 'math', 'history', etc.
+  flameColor: string;        // Session-scented color
+  rebirthMessage: string;    // Completion message
+}
+
+export interface AnansiYarn {
+  id: string;
+  riddle: string;            // The yarn/distraction
+  correctAnswer: string;     // Correct response
+  wrongAnswers: string[];    // Snare options (2-3)
+  reward: string;            // Trickster thread message
+  difficulty: 'easy' | 'medium' | 'hard';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MYTHIC STATE MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+
+export interface MythicState {
+  // Current active myth
+  activeMythFeature: 'kitsune' | 'phoenix' | 'anansi' | null;
+
+  // Kitsune state
+  kitsune: {
+    currentTailCount: number;
+    unlockedHaikus: string[];
+  };
+
+  // Phoenix state
+  phoenix: {
+    rebornCount: number;      // Times user completed prophecies
+    currentProphecy: PhoenixProphecy | null;
+  };
+
+  // Anansi state
+  anansi: {
+    yarnsSpun: number;        // Completed yarns
+    tricksterThreads: number; // Reward currency
+    currentYarn: AnansiYarn | null;
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILITY TYPES
+// ═══════════════════════════════════════════════════════════════
+
+export type MythicFeature = keyof MythicSettings['features'];
+
+export interface MythicEvent {
+  type: 'feature_enabled' | 'feature_disabled' | 'myth_completed' | 'settings_changed';
+  feature?: MythicFeature;
+  timestamp: Date;
+  data?: Record<string, unknown>;
+}

@@ -2,6 +2,10 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { Box, VStack, Text, HStack, useColorModeValue, IconButton, Tooltip } from "@chakra-ui/react";
 import { Link, useLocation } from "react-router-dom";
 import { getRevisionsDueToday } from "../services/database";
+import { useIsMythicFeatureActive } from "../stores/mythicStore";
+import { KitsuneTails, KitsuneTailsCompact } from "./mythic/KitsuneTails";
+import { FoxFireGlow } from "./mythic/FoxFireGlow";
+import { KitsuneHaikuTooltip } from "./mythic/KitsuneHaikuTooltip";
 
 const menuItems = [
   { path: "/", label: "Subjects", icon: "📚" },
@@ -25,6 +29,9 @@ export default function Sidebar() {
   });
   const isLoadingRef = useRef(false);
   const lastLoadTimeRef = useRef<number>(0);
+
+  // Mythic mode
+  const isKitsuneModeActive = useIsMythicFeatureActive('kitsuneSidebar');
 
   // Dark mode colors
   const bgColor = useColorModeValue("white", "#1a1a1a");
@@ -119,17 +126,32 @@ export default function Sidebar() {
     >
       <VStack spacing={0} align="stretch" h="100%">
         {/* App Logo/Name */}
-        <Box p={isCollapsed ? 3 : 6} borderBottom="1px solid" borderColor={borderColor}>
+        <Box p={isCollapsed ? 3 : 6} borderBottom="1px solid" borderColor={borderColor} position="relative">
           <HStack justify="space-between" align="center">
             {!isCollapsed && (
-              <Text
-                fontSize="2xl"
-                fontWeight="bold"
-                color={activeColor}
-                letterSpacing="tight"
-              >
-                Recallify
-              </Text>
+              <HStack spacing={3}>
+                <Text
+                  fontSize="2xl"
+                  fontWeight="bold"
+                  color={activeColor}
+                  letterSpacing="tight"
+                >
+                  Recallify
+                </Text>
+                {/* Kitsune tails (expanded view) */}
+                {isKitsuneModeActive && (
+                  <Box position="relative" top="-2px">
+                    <KitsuneTails size={32} animated={true} />
+                  </Box>
+                )}
+              </HStack>
+            )}
+            {/* Compact tail count badge (collapsed view) */}
+            {isCollapsed && isKitsuneModeActive && (
+              <Box position="relative">
+                <Text fontSize="xl" color={activeColor}>🦊</Text>
+                <KitsuneTailsCompact />
+              </Box>
             )}
             <IconButton
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -150,27 +172,33 @@ export default function Sidebar() {
               location.pathname === item.path ||
               (item.path !== "/" && location.pathname.startsWith(item.path));
 
-            const menuItem = (
-              <HStack
-                px={isCollapsed ? 2 : 4}
-                py={3}
+            const menuItemContent = (
+              <FoxFireGlow
+                isActive={isActive}
+                glowIntensity={isActive ? "high" : "medium"}
                 borderRadius="md"
-                bg={isActive ? activeBg : "transparent"}
-                color={isActive ? activeColor : textColor}
-                _hover={{
-                  bg: isActive ? activeBg : hoverBg,
-                }}
-                cursor="pointer"
-                transition="all 0.2s"
-                justify={isCollapsed ? "center" : "flex-start"}
               >
-                <Text fontSize="lg">{item.icon}</Text>
-                {!isCollapsed && (
-                  <Text fontWeight={isActive ? "semibold" : "normal"}>
-                    {item.label}
-                  </Text>
-                )}
-              </HStack>
+                <HStack
+                  px={isCollapsed ? 2 : 4}
+                  py={3}
+                  borderRadius="md"
+                  bg={isActive ? activeBg : "transparent"}
+                  color={isActive ? activeColor : textColor}
+                  _hover={{
+                    bg: isActive ? activeBg : hoverBg,
+                  }}
+                  cursor="pointer"
+                  transition="all 0.2s"
+                  justify={isCollapsed ? "center" : "flex-start"}
+                >
+                  <Text fontSize="lg">{item.icon}</Text>
+                  {!isCollapsed && (
+                    <Text fontWeight={isActive ? "semibold" : "normal"}>
+                      {item.label}
+                    </Text>
+                  )}
+                </HStack>
+              </FoxFireGlow>
             );
 
             return (
@@ -180,11 +208,16 @@ export default function Sidebar() {
                 style={{ width: "100%", textDecoration: "none" }}
               >
                 {isCollapsed ? (
-                  <Tooltip label={item.label} placement="right" hasArrow>
-                    {menuItem}
-                  </Tooltip>
+                  <KitsuneHaikuTooltip
+                    pageName={item.label}
+                    fallbackLabel={item.label}
+                    placement="right"
+                    hasArrow
+                  >
+                    {menuItemContent}
+                  </KitsuneHaikuTooltip>
                 ) : (
-                  menuItem
+                  menuItemContent
                 )}
               </Link>
             );

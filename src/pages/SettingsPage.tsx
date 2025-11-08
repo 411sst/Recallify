@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { getSettings, updateSetting } from "../services/database";
 import { useTheme } from "../contexts/ThemeContext";
+import { useMythicStore } from "../stores/mythicStore";
 
 export default function SettingsPage() {
   const [intervals, setIntervals] = useState<number[]>([3, 7]);
@@ -34,6 +35,18 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const { isDarkMode, toggleTheme } = useTheme();
   const toast = useToast();
+
+  // Mythic Mode settings
+  const {
+    enabled: mythicEnabled,
+    features,
+    performance,
+    accessibility,
+    toggleMythicMode,
+    toggleFeature,
+    updatePerformance,
+    updateAccessibility,
+  } = useMythicStore();
 
   useEffect(() => {
     loadSettings();
@@ -168,6 +181,183 @@ export default function SettingsPage() {
             <Text fontSize="sm" color="text.tertiary" mt={2}>
               Reduce eye strain in low-light environments
             </Text>
+          </CardBody>
+        </Card>
+
+        {/* 🌟 Mythic Mode */}
+        <Card borderWidth="2px" borderColor={mythicEnabled ? "purple.400" : "transparent"}>
+          <CardBody>
+            <HStack justify="space-between" mb={4}>
+              <Heading size="md">
+                🌟 Mythic Mode
+                <Tag ml={2} size="sm" colorScheme="purple">
+                  Experimental
+                </Tag>
+              </Heading>
+              <Switch
+                colorScheme="purple"
+                size="lg"
+                isChecked={mythicEnabled}
+                onChange={toggleMythicMode}
+              />
+            </HStack>
+
+            <Text fontSize="sm" color="text.tertiary" mb={4}>
+              Transform your study experience with folklore-inspired features: fox-spirit sidebar navigation, phoenix-fire loading screens, and Anansi's web-spinner pomodoro challenges.
+            </Text>
+
+            {mythicEnabled && (
+              <VStack spacing={4} align="stretch" pl={4} borderLeftWidth="2px" borderLeftColor="purple.300">
+                {/* Feature Toggles */}
+                <Box>
+                  <Text fontWeight="semibold" mb={2} fontSize="sm" color="text.secondary">
+                    Enabled Features
+                  </Text>
+
+                  <VStack spacing={3} align="stretch">
+                    <FormControl display="flex" alignItems="center">
+                      <FormLabel mb="0" flex="1" fontSize="sm">
+                        🦊 Kitsune Sidebar <Text as="span" fontSize="xs" color="text.tertiary">(Fox-fire navigation)</Text>
+                      </FormLabel>
+                      <Switch
+                        colorScheme="purple"
+                        size="sm"
+                        isChecked={features.kitsuneSidebar}
+                        onChange={() => toggleFeature('kitsuneSidebar')}
+                      />
+                    </FormControl>
+
+                    <FormControl display="flex" alignItems="center">
+                      <FormLabel mb="0" flex="1" fontSize="sm">
+                        🔥 Phoenix Loaders <Text as="span" fontSize="xs" color="text.tertiary">(Rebirth prophecies)</Text>
+                      </FormLabel>
+                      <Switch
+                        colorScheme="purple"
+                        size="sm"
+                        isChecked={features.phoenixLoaders}
+                        onChange={() => toggleFeature('phoenixLoaders')}
+                      />
+                    </FormControl>
+
+                    <FormControl display="flex" alignItems="center">
+                      <FormLabel mb="0" flex="1" fontSize="sm">
+                        🕷️ Anansi's Web <Text as="span" fontSize="xs" color="text.tertiary">(Spider-yarn riddles)</Text>
+                      </FormLabel>
+                      <Switch
+                        colorScheme="purple"
+                        size="sm"
+                        isChecked={features.anansiWeb}
+                        onChange={() => toggleFeature('anansiWeb')}
+                      />
+                    </FormControl>
+                  </VStack>
+                </Box>
+
+                <Divider />
+
+                {/* Performance Settings */}
+                <Box>
+                  <Text fontWeight="semibold" mb={2} fontSize="sm" color="text.secondary">
+                    Performance
+                  </Text>
+
+                  <VStack spacing={3} align="stretch">
+                    <FormControl>
+                      <HStack justify="space-between">
+                        <FormLabel mb="0" fontSize="sm">Animation Quality</FormLabel>
+                        <HStack>
+                          {(['low', 'medium', 'high'] as const).map((quality) => (
+                            <Button
+                              key={quality}
+                              size="xs"
+                              variant={performance.animationQuality === quality ? 'solid' : 'outline'}
+                              colorScheme="purple"
+                              onClick={() => updatePerformance({ animationQuality: quality })}
+                            >
+                              {quality.charAt(0).toUpperCase() + quality.slice(1)}
+                            </Button>
+                          ))}
+                        </HStack>
+                      </HStack>
+                      <Text fontSize="xs" color="text.tertiary" mt={1}>
+                        High: 60fps, Medium: 30fps, Low: 15fps
+                      </Text>
+                    </FormControl>
+
+                    <FormControl display="flex" alignItems="center">
+                      <FormLabel mb="0" flex="1" fontSize="sm">
+                        Enable Particles
+                      </FormLabel>
+                      <Switch
+                        colorScheme="purple"
+                        size="sm"
+                        isChecked={performance.particlesEnabled}
+                        onChange={(e) => updatePerformance({ particlesEnabled: e.target.checked })}
+                      />
+                    </FormControl>
+
+                    <FormControl display="flex" alignItems="center">
+                      <FormLabel mb="0" flex="1" fontSize="sm">
+                        Enable Audio
+                      </FormLabel>
+                      <Switch
+                        colorScheme="purple"
+                        size="sm"
+                        isChecked={performance.audioEnabled}
+                        onChange={(e) => updatePerformance({ audioEnabled: e.target.checked })}
+                      />
+                    </FormControl>
+                  </VStack>
+                </Box>
+
+                <Divider />
+
+                {/* Accessibility Settings */}
+                <Box>
+                  <Text fontWeight="semibold" mb={2} fontSize="sm" color="text.secondary">
+                    Accessibility
+                  </Text>
+
+                  <VStack spacing={3} align="stretch">
+                    <FormControl display="flex" alignItems="center">
+                      <FormLabel mb="0" flex="1" fontSize="sm">
+                        Reduced Motion
+                      </FormLabel>
+                      <Switch
+                        colorScheme="purple"
+                        size="sm"
+                        isChecked={accessibility.reducedMotion}
+                        onChange={(e) => updateAccessibility({ reducedMotion: e.target.checked })}
+                      />
+                    </FormControl>
+
+                    <FormControl display="flex" alignItems="center">
+                      <FormLabel mb="0" flex="1" fontSize="sm">
+                        Mute Audio
+                      </FormLabel>
+                      <Switch
+                        colorScheme="purple"
+                        size="sm"
+                        isChecked={accessibility.muteAudio}
+                        onChange={(e) => updateAccessibility({ muteAudio: e.target.checked })}
+                      />
+                    </FormControl>
+
+                    <FormControl display="flex" alignItems="center">
+                      <FormLabel mb="0" flex="1" fontSize="sm">
+                        High Contrast
+                      </FormLabel>
+                      <Switch
+                        colorScheme="purple"
+                        size="sm"
+                        isChecked={accessibility.highContrast}
+                        onChange={(e) => updateAccessibility({ highContrast: e.target.checked })}
+                      />
+                    </FormControl>
+                  </VStack>
+                </Box>
+              </VStack>
+            )}
           </CardBody>
         </Card>
 

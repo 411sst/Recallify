@@ -1,0 +1,262 @@
+{
+  "kitsune": {
+    "tales": [
+      {
+        "id": "kitsune-001",
+        "title": "The Fox's First Tail",
+        "culture": "japanese",
+        "content": "Young Kitsune lived by the shrine, watching scholars pass. Each moonrise, she practiced their writing with her tail in sand. After a hundred years of patient study, her tail split in two—wisdom's first reward. 'Knowledge,' whispered the moon, 'grows not from speed, but from seasons.'",
+        "theme": ["patience", "wisdom", "growth"],
+        "tone": "inspiring"
+      },
+      {
+        "id": "kitsune-002",
+        "title": "Nine-Tailed Nogitsune's Riddle",
+        "culture": "japanese",
+        "content": "The ancient Nogitsune posed riddles at crossroads. 'I have nine tails but walk on two,' she laughed. 'I hoard secrets yet share them freely. What am I?' Travelers guessed: wind, shadow, echo. 'Nay,' she grinned. 'A teacher—who learns as she teaches, tail by tail.'",
+        "theme": ["teaching", "mystery", "paradox"],
+        "tone": "playful"
+      },
+      {
+        "id": "kitsune-003",
+        "title": "The Shape-Shifting Scholar",
+        "culture": "japanese",
+        "content": "Kitsune Yuki took human form to study at the academy. Each subject she mastered, another tail grew beneath her illusion. When discovered, the master asked: 'Why hide your tails?' She smiled: 'To remember—true learning requires humility, not showing off.'",
+        "theme": ["humility", "mastery", "identity"],
+        "tone": "mysterious"
+      }
+    ],
+    "haikus": [
+      {
+        "tailCount": 1,
+        "haiku": "One tail sweeps the path\nFirst steps on wisdom's journey\nFox-fire flickers new",
+        "meaning": "Beginning your study journey"
+      },
+      {
+        "tailCount": 2,
+        "haiku": "Two tails, dual vision\nContrast births understanding\nYin-yang in balance",
+        "meaning": "Seeing both sides of concepts"
+      },
+      {
+        "tailCount": 3,
+        "haiku": "Triple tails entwine\nBody, mind, and spirit learn\nHarmony in three",
+        "meaning": "Holistic learning approach"
+      },
+      {
+        "tailCount": 4,
+        "haiku": "Four seasons, four tails\nSpring planting, autumn harvest\nCycles of knowledge",
+        "meaning": "Consistent study through seasons"
+      },
+      {
+        "tailCount": 5,
+        "haiku": "Five elements flow\nEarth, water, fire, wind, void\nStudy's full spectrum",
+        "meaning": "Mastering diverse subjects"
+      },
+      {
+        "tailCount": 6,
+        "haiku": "Six paths converge here\nWhiskers sense the subtle truths\nIntuition wakes",
+        "meaning": "Deep understanding emerging"
+      },
+      {
+        "tailCount": 7,
+        "haiku": "Lucky seven tails\nFortune favors the patient\nStars align at last",
+        "meaning": "Breakthrough moments from persistence"
+      },
+      {
+        "tailCount": 8,
+        "haiku": "Eight-fold path unfolds\nAlmost at enlightenment\nOne more moon to climb",
+        "meaning": "Near mastery, final push"
+      },
+      {
+        "tailCount": 9,
+        "haiku": "Nine tails fan the flames\nMaster becomes the teacher\nCycle spins anew",
+        "meaning": "Full mastery achieved"
+      }
+    ]
+  },
+
+  "phoenix": {
+    "prophecies": [
+      {
+        "id": "phoenix-001",
+        "sessionContext": "math",
+        "prophecy": "From ash and ember, numbers dance—equations reborn in phoenix-flame geometry.",
+        "flameColor": "#FF6B35",
+        "rebirthMessage": "Like the phoenix rising, your understanding soars from the ashes of confusion!"
+      },
+      {
+        "id": "phoenix-002",
+        "sessionContext": "history",
+        "prophecy": "Civilizations fall to cinder, yet their wisdom rises—immortal as the firebird's song.",
+        "flameColor": "#D4AF37",
+        "rebirthMessage": "History repeats, but your knowledge transcends—reborn wiser with each cycle!"
+      },
+      {
+        "id": "phoenix-003",
+        "sessionContext": "science",
+        "prophecy": "In the pyre's heart, atoms split and fuse—creation's eternal rebirth in miniature.",
+        "flameColor": "#4ECDC4",
+        "rebirthMessage": "From hypothesis to understanding—your knowledge undergoes metamorphosis!"
+      },
+      {
+        "id": "phoenix-004",
+        "sessionContext": "language",
+        "prophecy": "Words burn away, their meaning survives—phoenix-tongue speaks beyond the flames.",
+        "flameColor": "#9B59B6",
+        "rebirthMessage": "Language dies and is reborn—you carry its living essence forward!"
+      },
+      {
+        "id": "phoenix-005",
+        "sessionContext": "art",
+        "prophecy": "From scorched canvas springs new vision—the phoenix paints with ashes and starlight.",
+        "flameColor": "#E74C3C",
+        "rebirthMessage": "Creativity burns eternal—your imagination rises, reborn more vibrant!"
+      },
+      {
+        "id": "phoenix-006",
+        "sessionContext": "default",
+        "prophecy": "The firebird circles thrice—past study feeds the future, rising ever higher.",
+        "flameColor": "#F39C12",
+        "rebirthMessage": "From these ashes: renewed focus, reborn determination, rising mastery!"
+      },
+      {
+        "id": "phoenix-007",
+        "sessionContext": "review",
+        "prophecy": "Old knowledge smolders in memory's nest—fanning embers births blazing recall.",
+        "flameColor": "#E67E22",
+        "rebirthMessage": "Review ignites remembrance—what was forgotten flies anew!"
+      },
+      {
+        "id": "phoenix-008",
+        "sessionContext": "break",
+        "prophecy": "Even phoenixes rest in ash-bed slumber—restoration precedes resurrection.",
+        "flameColor": "#95A5A6",
+        "rebirthMessage": "Rest completes the cycle—you emerge refreshed, ready to soar!"
+      }
+    ],
+    "flameDescriptions": {
+      "lava": "Molten mathematics flows—calculus cascades in crimson currents.",
+      "azure": "Blue flames of logic burn cold and pure—reason's frozen fire.",
+      "emerald": "Green growth-fire—knowledge sprouting like spring's first leaf.",
+      "violet": "Purple pyre of creativity—imagination's incandescent bloom.",
+      "gold": "Golden glory-flames—mastery's crowning conflagration."
+    }
+  },
+
+  "anansi": {
+    "yarns": [
+      {
+        "id": "anansi-001",
+        "riddle": "Anansi whispers: 'To catch the study-fly, you must first...?' Quick! Choose your thread:",
+        "correctAnswer": "spin a patient web",
+        "wrongAnswers": ["chase it frantically", "wait for it to land", "set a trap"],
+        "reward": "Clever spinner! You've earned a silk-strong focus thread.",
+        "difficulty": "easy",
+        "moral": "Patience and preparation catch what haste cannot."
+      },
+      {
+        "id": "anansi-002",
+        "riddle": "The spider-god grins: 'I weave eight webs yet walk on eight—what am I teaching?' Spin your answer:",
+        "correctAnswer": "balance in all directions",
+        "wrongAnswers": ["multiplication tables", "spider anatomy", "web architecture"],
+        "reward": "Wise weaver! Your threads gleam with understanding.",
+        "difficulty": "medium",
+        "moral": "Balance your studies as the spider balances on silk."
+      },
+      {
+        "id": "anansi-003",
+        "riddle": "Anansi asks: 'When the web breaks, does the spider despair or...?' Choose your path:",
+        "correctAnswer": "begin spinning anew",
+        "wrongAnswers": ["give up and leave", "repair the old web", "blame the wind"],
+        "reward": "Resilient one! Trickster threads now strengthen your resolve.",
+        "difficulty": "easy",
+        "moral": "Mistakes are silk for stronger webs tomorrow."
+      },
+      {
+        "id": "anansi-004",
+        "riddle": "The trickster weaves words: 'Study is a web because...?' Unravel the truth:",
+        "correctAnswer": "each thread connects to all others",
+        "wrongAnswers": ["it catches information", "it's sticky and complex", "spiders make it"],
+        "reward": "Networked thinker! Your web of knowledge expands.",
+        "difficulty": "medium",
+        "moral": "All knowledge interconnects—find the threads between."
+      },
+      {
+        "id": "anansi-005",
+        "riddle": "Anansi challenges: 'I am lightest when most full, heaviest when empty. What am I?' Speak truth:",
+        "correctAnswer": "a mind learning",
+        "wrongAnswers": ["a spider's web", "a water jug", "a balloon"],
+        "reward": "Philosopher-spinner! You've caught wisdom itself.",
+        "difficulty": "hard",
+        "moral": "Knowledge makes the mind soar; ignorance weighs it down."
+      },
+      {
+        "id": "anansi-006",
+        "riddle": "The web-weaver whispers: 'Too many flies in the web means...?' Think quickly:",
+        "correctAnswer": "time to digest what you've caught",
+        "wrongAnswers": ["great success!", "the web is strong", "you need a bigger web"],
+        "reward": "Mindful hunter! Moderation threads bind your wisdom.",
+        "difficulty": "medium",
+        "moral": "Better to digest few lessons deeply than choke on many."
+      },
+      {
+        "id": "anansi-007",
+        "riddle": "Anansi spins a riddle: 'When is a distraction not a snare but a sign?' Your answer:",
+        "correctAnswer": "when it teaches you to refocus",
+        "wrongAnswers": ["never—distractions are always bad", "when you enjoy it", "when it's short"],
+        "reward": "Meta-weaver! You've spun wisdom from interruption itself.",
+        "difficulty": "hard",
+        "moral": "Even distractions teach—observe why the web catches what it catches."
+      },
+      {
+        "id": "anansi-008",
+        "riddle": "The trickster asks: 'Why does Anansi interrupt your focus?' Choose wisely:",
+        "correctAnswer": "to test if you've woven discipline",
+        "wrongAnswers": ["to annoy you", "because he's mischievous", "to make you fail"],
+        "reward": "Initiate of the web! You understand the test within the trickery.",
+        "difficulty": "easy",
+        "moral": "Interruptions reveal the strength of your mental web."
+      },
+      {
+        "id": "anansi-009",
+        "riddle": "Anansi spins: 'The strongest web is invisible. Why?' Unravel:",
+        "correctAnswer": "habits need no conscious thought",
+        "wrongAnswers": ["transparent silk is strongest", "invisible means magical", "spiders hide their best webs"],
+        "reward": "Habit-weaver! Your threads now spin themselves.",
+        "difficulty": "hard",
+        "moral": "The best study habits become automatic—invisible yet unbreakable."
+      },
+      {
+        "id": "anansi-010",
+        "riddle": "The spider-god grins: 'When the Pomodoro ends, the web...?' Complete the wisdom:",
+        "correctAnswer": "holds the catch for later",
+        "wrongAnswers": ["disappears completely", "must be rewoven", "releases everything"],
+        "reward": "Time-weaver! You've learned to preserve focus across breaks.",
+        "difficulty": "medium",
+        "moral": "Good focus carries momentum through rest—the web remembers."
+      }
+    ],
+    "rewardMessages": [
+      "Trickster thread acquired! Your web gleams stronger.",
+      "Anansi nods approval—silk of wisdom added to your loom.",
+      "The spider-god's laughter echoes: 'Clever spinner!' Thread earned.",
+      "Your web grows more intricate. Another thread woven!",
+      "Wisdom-silk granted! The trickster respects your wit."
+    ]
+  },
+
+  "general": {
+    "mythicQuotes": [
+      "The fox learns by moonlight what the owl teaches at dusk.",
+      "Phoenix-fire burns away the unnecessary, leaving only truth.",
+      "Anansi's web catches flies, but wisdom catches Anansi.",
+      "Nine tails carry nine lessons—each heavier than the last.",
+      "From ashes, clarity. From embers, enlightenment.",
+      "The trickster's greatest trick: making you think while you play.",
+      "Shape-shifters study all forms to master their own.",
+      "Rebirth requires death—of old habits, wrong assumptions, false starts.",
+      "A web is patient because the spider knows: the fly will come.",
+      "The firebird's secret: falling is just flying toward tomorrow."
+    ]
+  }
+}

@@ -25,6 +25,8 @@ import { sendNotification } from "@tauri-apps/api/notification";
 import { format } from "date-fns";
 import { updateDailyActivity, calculateStreaks, checkAndRecordMilestone, markMilestoneShown, getTodayPomodoroSummary } from "../services/database";
 import CelebrationModal from "../components/CelebrationModal";
+import { useAnansiYarn } from "../hooks/useAnansiYarn";
+import { AnansiRiddleModal } from "../components/mythic/AnansiRiddleModal";
 
 interface PomodoroState {
   session_type: "work" | "short_break" | "long_break";
@@ -69,6 +71,13 @@ export default function PomodoroPage() {
   } = useDisclosure();
   const [celebrationMilestone, setCelebrationMilestone] = useState<number | null>(null);
   const toast = useToast();
+
+  // 🕷️ Anansi's Web integration
+  const { showRiddle, currentYarn, closeRiddle } = useAnansiYarn({
+    sessionType: state.session_type,
+    sessionDuration: state.session_type === 'work' ? 1500 : state.session_type === 'short_break' ? 300 : longBreakDuration * 60,
+    isRunning: state.is_running === 1,
+  });
 
   // Dark mode colors
   const circleBg = useColorModeValue("white", "#1a1a1a");
@@ -751,6 +760,29 @@ export default function PomodoroPage() {
           }
           setCelebrationMilestone(null);
           onCelebrationClose();
+        }}
+      />
+
+      {/* 🕷️ Anansi's Web Riddle Modal */}
+      <AnansiRiddleModal
+        isOpen={showRiddle}
+        onClose={closeRiddle}
+        yarn={currentYarn}
+        onCorrect={() => {
+          toast({
+            title: 'Focus Rewarded!',
+            description: 'You resisted the distraction and earned wisdom.',
+            status: 'success',
+            duration: 3000,
+          });
+        }}
+        onWrong={() => {
+          toast({
+            title: 'Caught in the Web',
+            description: 'Learn from this and strengthen your focus.',
+            status: 'info',
+            duration: 3000,
+          });
         }}
       />
     </Box>
