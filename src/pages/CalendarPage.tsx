@@ -181,10 +181,12 @@ export default function CalendarPage() {
           <Grid
             templateColumns="repeat(7, 1fr)"
             gap={2}
-            bg="white"
+            bg="var(--theme-card-bg)"
             p={4}
             borderRadius="md"
             boxShadow="sm"
+            borderWidth="1px"
+            borderColor="var(--theme-border)"
           >
             {/* Day headers */}
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
@@ -220,26 +222,26 @@ export default function CalendarPage() {
                   <VStack
                     p={2}
                     h="80px"
-                    bg={isSelected ? "primary.50" : "transparent"}
+                    bg={isSelected ? "var(--theme-card-hover)" : "transparent"}
                     borderRadius="md"
                     border="1px solid"
                     borderColor={
                       isToday
-                        ? "primary.500"
+                        ? "var(--mythic-primary)"
                         : isSelected
-                        ? "primary.300"
-                        : "gray.100"
+                        ? "var(--mythic-secondary)"
+                        : "var(--theme-border)"
                     }
                     cursor="pointer"
                     onClick={() => handleDateClick(dateStr)}
                     _hover={{
-                      bg: isSelected ? "primary.50" : "gray.50",
+                      bg: "var(--theme-card-hover)",
                     }}
                     spacing={1}
                   >
                     <Text
                       fontWeight={isToday ? "bold" : "normal"}
-                      color={isToday ? "primary.500" : "text.primary"}
+                      color={isToday ? "var(--mythic-primary)" : "var(--theme-text-primary)"}
                     >
                       {format(day, "d")}
                     </Text>
@@ -277,8 +279,10 @@ export default function CalendarPage() {
                       <Box
                         key={revision.id}
                         p={3}
-                        bg="gray.50"
+                        bg="var(--theme-card-hover)"
                         borderRadius="md"
+                        borderWidth="1px"
+                        borderColor="var(--theme-border)"
                       >
                         <HStack justify="space-between" align="start" mb={2}>
                           <VStack align="start" spacing={0} flex="1">
