@@ -172,12 +172,49 @@ export interface MythicEvent {
 export type MythicTheme = 'default' | 'kitsune-autumn' | 'phoenix-inferno' | 'anansi-twilight';
 
 export interface ThemeColors {
+  // Primary brand colors
   primary: string;
   secondary: string;
   accent: string;
-  background: string;
-  text: string;
   glow: string;
+
+  // Light mode colors
+  light: {
+    background: string;      // Main page background
+    cardBg: string;          // Card backgrounds
+    cardHover: string;       // Card hover state
+    border: string;          // Border color
+    text: {
+      primary: string;       // Main text
+      secondary: string;     // Secondary text
+      tertiary: string;      // Muted text
+    };
+    sidebar: {
+      bg: string;            // Sidebar background
+      hover: string;         // Sidebar hover
+      active: string;        // Active item
+      text: string;          // Sidebar text
+    };
+  };
+
+  // Dark mode colors
+  dark: {
+    background: string;
+    cardBg: string;
+    cardHover: string;
+    border: string;
+    text: {
+      primary: string;
+      secondary: string;
+      tertiary: string;
+    };
+    sidebar: {
+      bg: string;
+      hover: string;
+      active: string;
+      text: string;
+    };
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════
