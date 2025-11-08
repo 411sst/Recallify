@@ -5,8 +5,8 @@
 
 import { Tooltip, TooltipProps, Box, Text } from '@chakra-ui/react';
 import { ReactNode } from 'react';
-import { useCurrentKitsuneHaiku } from '../../hooks/useFolklore';
-import { useIsMythicFeatureActive } from '../../stores/mythicStore';
+import { useKitsuneHaikus } from '../../hooks/useFolklore';
+import { useIsMythicFeatureActive, useMythicStore } from '../../stores/mythicStore';
 
 interface KitsuneHaikuTooltipProps extends Omit<TooltipProps, 'label'> {
   children: ReactNode;
@@ -21,7 +21,25 @@ export function KitsuneHaikuTooltip({
   ...tooltipProps
 }: KitsuneHaikuTooltipProps) {
   const isMythicActive = useIsMythicFeatureActive('kitsuneSidebar');
-  const { haiku, tailCount } = useCurrentKitsuneHaiku();
+  const allHaikus = useKitsuneHaikus();
+  const { kitsune } = useMythicStore();
+  const tailCount = kitsune.currentTailCount;
+
+  // Create unique haiku selection based on page name
+  // This ensures each sidebar section shows a different haiku
+  const getPageOffset = (name?: string): number => {
+    if (!name) return 0;
+    // Simple hash function to create consistent offset per page
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash) % 9;
+  };
+
+  const pageOffset = getPageOffset(pageName);
+  const haikuIndex = (tailCount - 1 + pageOffset) % 9;
+  const haiku = allHaikus[haikuIndex] || allHaikus[0];
 
   // If mythic mode is off, use fallback label
   if (!isMythicActive) {
@@ -66,6 +84,9 @@ export function KitsuneHaikuTooltip({
       boxShadow="0 0 20px rgba(255, 107, 53, 0.3)"
       hasArrow
       placement="right"
+      closeOnMouseDown
+      closeOnScroll
+      closeDelay={0}
       {...tooltipProps}
     >
       {children}

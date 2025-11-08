@@ -64,6 +64,7 @@ import SyllabusTab from "../components/SyllabusTab";
 import RichTextEditor from "../components/RichTextEditor";
 import CelebrationModal from "../components/CelebrationModal";
 import { getPreviewText } from "../utils/richTextUtils";
+import { PhoenixLoader } from "../components/mythic/PhoenixLoader";
 
 export default function SubjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -403,7 +404,7 @@ export default function SubjectDetailPage() {
   if (!subject) {
     return (
       <Box textAlign="center" py={16}>
-        <Text fontSize="lg" color="text.tertiary">
+        <Text fontSize="lg" color={tertiaryTextColor}>
           Subject not found
         </Text>
         <Button mt={4} onClick={() => navigate("/")}>
@@ -425,13 +426,19 @@ export default function SubjectDetailPage() {
     .filter((r) => new Date(r.due_date) <= new Date());
 
   return (
-    <Box>
-      <HStack justify="space-between" mb={8}>
+    <>
+      <PhoenixLoader
+        isLoading={loading}
+        sessionContext={subject?.name}
+        showConfetti={true}
+      />
+      <Box>
+        <HStack justify="space-between" mb={8}>
         <HStack spacing={4}>
           <Button
             variant="ghost"
             onClick={() => navigate("/")}
-            color="text.tertiary"
+            color={tertiaryTextColor}
           >
             ← Back
           </Button>
@@ -459,7 +466,7 @@ export default function SubjectDetailPage() {
             </HStack>
           ) : (
             <HStack>
-              <Heading size="xl" color="text.primary">
+              <Heading size="xl" color={textColor}>
                 {subject.name}
               </Heading>
               <IconButton
@@ -700,7 +707,7 @@ export default function SubjectDetailPage() {
                   value={topics}
                   onChange={(e) => setTopics(e.target.value)}
                 />
-                <Text fontSize="xs" color="text.tertiary" mt={1}>
+                <Text fontSize="xs" color={tertiaryTextColor} mt={1}>
                   💡 Enter topics separated by commas or line breaks
                 </Text>
               </FormControl>
@@ -712,7 +719,7 @@ export default function SubjectDetailPage() {
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
                 />
-                <Text fontSize="xs" color="text.tertiary" mt={1}>
+                <Text fontSize="xs" color={tertiaryTextColor} mt={1}>
                   💡 Add tags to categorize and find entries easily (comma-separated)
                 </Text>
               </FormControl>
@@ -739,7 +746,7 @@ export default function SubjectDetailPage() {
 
               <FormControl>
                 <FormLabel>Revision Intervals (days) - Optional</FormLabel>
-                <Text fontSize="xs" color="text.tertiary" mb={2}>
+                <Text fontSize="xs" color={tertiaryTextColor} mb={2}>
                   💡 Add revision intervals for spaced repetition. Leave empty if no revision needed.
                 </Text>
                 <HStack mb={2}>
@@ -849,6 +856,7 @@ export default function SubjectDetailPage() {
           onCelebrationClose();
         }}
       />
-    </Box>
+      </Box>
+    </>
   );
 }
