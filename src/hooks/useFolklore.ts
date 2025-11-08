@@ -24,6 +24,12 @@ export const useKitsuneHaiku = (tailCount: number): string => {
   }, [tailCount]);
 };
 
+export const useKitsuneHaikus = (): string[] => {
+  return useMemo(() => {
+    return folkloreData.kitsune.haikus.map((h) => h.haiku);
+  }, []);
+};
+
 export const useKitsuneTailCount = (): number => {
   const [currentStreak, setCurrentStreak] = useState(1);
 
