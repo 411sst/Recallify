@@ -3,7 +3,6 @@
  * Custom color palettes for each mythical creature
  */
 
-import { extendTheme, type ThemeOverride } from '@chakra-ui/react';
 import type { MythicTheme, ThemeColors } from '../types/mythic';
 
 // Theme color palettes
@@ -41,46 +40,6 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
     glow: '#7C3AED',       // Anansi aura (web-weft wonder)
   },
 };
-
-/**
- * Generate Chakra UI theme override based on mythic theme
- */
-export function getMythicThemeOverride(mythicTheme: MythicTheme): ThemeOverride {
-  const colors = MYTHIC_THEME_COLORS[mythicTheme];
-
-  return {
-    colors: {
-      primary: {
-        50: lighten(colors.primary, 0.4),
-        100: lighten(colors.primary, 0.3),
-        200: lighten(colors.primary, 0.2),
-        300: lighten(colors.primary, 0.1),
-        400: lighten(colors.primary, 0.05),
-        500: colors.primary,
-        600: darken(colors.primary, 0.1),
-        700: darken(colors.primary, 0.2),
-        800: darken(colors.primary, 0.3),
-        900: darken(colors.primary, 0.4),
-      },
-      teal: {
-        500: colors.secondary,
-        600: darken(colors.secondary, 0.1),
-        700: darken(colors.secondary, 0.2),
-      },
-      background: {
-        main: colors.background,
-        card: lighten(colors.background, 0.5),
-      },
-    },
-    styles: {
-      global: {
-        body: {
-          '--mythic-glow': colors.glow,
-        },
-      },
-    },
-  };
-}
 
 /**
  * Lighten a hex color by percentage
