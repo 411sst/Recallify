@@ -38,27 +38,31 @@ export function PhoenixLoader({
 
   const MIN_DISPLAY_TIME = 2000; // 2 seconds minimum to see prophecy
 
-  // Track when loading starts
+  // Track when loading starts - always track, even if mythic mode is off
   useEffect(() => {
-    if (isLoading && isActive) {
+    if (isLoading) {
       setLoadStartTime(Date.now());
       setShowLoader(true);
       setHasCompleted(false);
     }
-  }, [isLoading, isActive]);
+  }, [isLoading]);
 
   // Handle loading completion with minimum display time
   useEffect(() => {
-    if (!isLoading && showLoader && !hasCompleted && isActive && loadStartTime) {
+    if (!isLoading && showLoader && !hasCompleted && loadStartTime) {
       const elapsed = Date.now() - loadStartTime;
-      const remaining = Math.max(0, MIN_DISPLAY_TIME - elapsed);
+      const remaining = isActive ? Math.max(0, MIN_DISPLAY_TIME - elapsed) : 0;
 
       const timer = setTimeout(() => {
         setHasCompleted(true);
         setShowLoader(false);
+
+        // ALWAYS trigger confetti when loading completes, regardless of mythic mode
         if (showConfetti) {
           triggerRebirthConfetti();
-          incrementRebornCount();
+          if (isActive) {
+            incrementRebornCount();
+          }
         }
         onLoadComplete?.();
       }, remaining);
@@ -67,26 +71,33 @@ export function PhoenixLoader({
     }
   }, [isLoading, showLoader, hasCompleted, isActive, showConfetti, incrementRebornCount, onLoadComplete, loadStartTime]);
 
-  // Don't show loader if mythic mode is off
+  // Fallback standard loader when mythic mode is off
   if (!isActive) {
-    if (!isLoading) return null;
-
-    // Fallback standard loader
     return (
-      <Box
-        position="fixed"
-        inset={0}
-        bg={bgColor}
-        backdropFilter="blur(4px)"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        zIndex={9999}
-      >
-        <VStack spacing={4}>
-          <Text fontSize="lg" color={textColor}>{loadingText}</Text>
-        </VStack>
-      </Box>
+      <AnimatePresence>
+        {showLoader && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: bgColor,
+              backdropFilter: 'blur(4px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999,
+            }}
+          >
+            <VStack spacing={4}>
+              <Text fontSize="lg" color={textColor}>{loadingText}</Text>
+            </VStack>
+          </motion.div>
+        )}
+      </AnimatePresence>
     );
   }
 
