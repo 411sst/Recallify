@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Box, VStack, Text, HStack, useColorModeValue, IconButton, Tooltip } from "@chakra-ui/react";
+import { Box, VStack, Text, HStack, IconButton, Tooltip } from "@chakra-ui/react";
 import { Link, useLocation } from "react-router-dom";
 import { getRevisionsDueToday } from "../services/database";
 import { useIsMythicFeatureActive } from "../stores/mythicStore";
@@ -34,13 +34,13 @@ export default function Sidebar() {
   // Mythic mode
   const isKitsuneModeActive = useIsMythicFeatureActive('kitsuneSidebar');
 
-  // Dark mode colors
-  const bgColor = useColorModeValue("white", "#1a1a1a");
-  const borderColor = useColorModeValue("gray.200", "#333333");
-  const textColor = useColorModeValue("text.secondary", "#e0e0e0");
-  const hoverBg = useColorModeValue("gray.50", "#252525");
-  const activeBg = useColorModeValue("primary.50", "#2F2F2F");
-  const activeColor = useColorModeValue("primary.500", "#1EA896");
+  // Theme colors - now uses CSS variables set by theme
+  const bgColor = "var(--theme-sidebar-bg)";
+  const borderColor = "var(--theme-border)";
+  const textColor = "var(--theme-sidebar-text)";
+  const hoverBg = "var(--theme-sidebar-hover)";
+  const activeBg = "var(--theme-sidebar-active)";
+  const activeColor = "var(--theme-sidebar-active)";
 
   // Memoized load function with debouncing
   const loadDueCount = useCallback(async () => {

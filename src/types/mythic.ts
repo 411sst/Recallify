@@ -195,6 +195,18 @@ export interface ThemeColors {
       active: string;        // Active item
       text: string;          // Sidebar text
     };
+    input: {
+      bg: string;            // Input background
+      border: string;        // Input border
+      borderFocus: string;   // Input focus state
+    };
+    button: {
+      primaryBg: string;     // Primary button
+      primaryText: string;   // Button text
+      primaryHover: string;  // Hover state
+      secondaryBorder: string; // Outline button
+      secondaryHover: string;  // Outline hover
+    };
   };
 
   // Dark mode colors
@@ -214,6 +226,34 @@ export interface ThemeColors {
       active: string;
       text: string;
     };
+    input: {
+      bg: string;
+      border: string;
+      borderFocus: string;
+    };
+    button: {
+      primaryBg: string;
+      primaryText: string;
+      primaryHover: string;
+      secondaryBorder: string;
+      secondaryHover: string;
+    };
+  };
+
+  // Status colors (same for light/dark)
+  status: {
+    success: string;
+    warning: string;
+    error: string;
+    info: string;
+  };
+
+  // Calendar heatmap (intensity levels)
+  heatmap: {
+    none: string;
+    low: string;
+    medium: string;
+    high: string;
   };
 }
 

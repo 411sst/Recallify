@@ -25,11 +25,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Always apply the selected theme, even if mythic mode is off
     // This allows themes to work as global color palettes
     if (currentTheme) {
-      applyMythicTheme(currentTheme);
+      applyMythicTheme(currentTheme, isDarkMode);
     } else {
-      applyMythicTheme('default');
+      applyMythicTheme('default', isDarkMode);
     }
-  }, [currentTheme]);
+  }, [currentTheme, isDarkMode]);
 
   async function loadTheme() {
     try {
