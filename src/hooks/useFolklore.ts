@@ -3,7 +3,7 @@
  * Access mythological tales, haikus, prophecies, and yarns
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import folkloreData from '../data/folklore.json';
 import { FolkloreTale, PhoenixProphecy, AnansiYarn } from '../types/mythic';
 import { useMythicStore } from '../stores/mythicStore';
@@ -25,8 +25,24 @@ export const useKitsuneHaiku = (tailCount: number): string => {
 };
 
 export const useKitsuneTailCount = (): number => {
-  // Calculate tail count based on current streak
-  const currentStreak = 5; // TODO: Get from streak calculation
+  const [currentStreak, setCurrentStreak] = useState(1);
+
+  useEffect(() => {
+    // Calculate streak from database
+    const loadStreak = async () => {
+      try {
+        // Use the database streak calculation
+        const { calculateStreaks } = await import('../services/database');
+        const streaks = await calculateStreaks();
+        setCurrentStreak(streaks.currentStreak || 1);
+      } catch (error) {
+        console.error('Failed to load streak for Kitsune:', error);
+        setCurrentStreak(1); // Default to 1 tail on error
+      }
+    };
+
+    loadStreak();
+  }, []);
 
   // Tail count mapping: 1-6 days = 1 tail, 7-13 = 2 tails, etc.
   // Formula: Math.min(Math.floor(streak / 7) + 1, 9)
