@@ -9,36 +9,36 @@ import type { MythicTheme, ThemeColors } from '../types/mythic';
 // Theme color palettes
 export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
   default: {
-    primary: '#005108',
-    secondary: '#1EA896',
-    accent: '#F59E0B',
-    background: '#FBFFF1',
-    text: '#0A122A',
-    glow: '#1EA896',
+    primary: '#005108',    // Dark green (main brand color)
+    secondary: '#1EA896',  // Teal (accent color)
+    accent: '#F59E0B',     // Orange/Amber (highlights)
+    background: '#FBFFF1', // Off-white cream
+    text: '#0A122A',       // Dark navy
+    glow: '#1EA896',       // Teal glow effects
   },
   'kitsune-autumn': {
-    primary: '#D97706',      // Warm orange
-    secondary: '#DC2626',    // Fox-fire red
-    accent: '#F59E0B',       // Amber
-    background: '#FEF3C7',   // Pale autumn
-    text: '#78350F',         // Deep brown
-    glow: '#FF6B35',         // Fox-fire glow
+    primary: '#B45309',    // Burnt sienna (deep autumn anchor)
+    secondary: '#DC6803',  // Amber glow (leaf-litter lift)
+    accent: '#F59E0B',     // Goldenrod spark (fox-fire flickers)
+    background: '#FDF4F3', // Warm peach cream (hazy harvest hush)
+    text: '#451A03',       // Rich walnut (storyteller's shadow)
+    glow: '#D97706',       // Kitsune ember (tail-tip tease)
   },
   'phoenix-inferno': {
-    primary: '#DC2626',      // Flame red
-    secondary: '#F59E0B',    // Phoenix gold
-    accent: '#FF6B35',       // Ember orange
-    background: '#FEF2F2',   // Pale flame
-    text: '#7C2D12',         // Ash brown
-    glow: '#F39C12',         // Golden glow
+    primary: '#B91C1C',    // Crimson core (flame-heart fury)
+    secondary: '#EF4444',  // Scarlet surge (wing-wake warmth)
+    accent: '#F97316',     // Ember orange (rebirth's bold burst)
+    background: '#FEF7F6', // Blush ash (smoldering serenity)
+    text: '#1F2937',       // Charcoal forge (ancient anvil etch)
+    glow: '#DC2626',       // Phoenix blaze (talon-trail torch)
   },
   'anansi-twilight': {
-    primary: '#7C3AED',      // Twilight purple
-    secondary: '#6366F1',    // Indigo web
-    accent: '#8B5CF6',       // Violet
-    background: '#F5F3FF',   // Pale twilight
-    text: '#4C1D95',         // Deep purple
-    glow: '#A78BFA',         // Web glow
+    primary: '#6D28D9',    // Deep indigo (spider-silk spine)
+    secondary: '#A78BFA',  // Lavender loom (dusk-dew drift)
+    accent: '#8B5CF6',     // Plum pulse (yarn-yank yarn)
+    background: '#FCFCFF', // Moon-mist pearl (twilight's tender veil)
+    text: '#1E1B4B',       // Midnight mulberry (weaver's whisper)
+    glow: '#7C3AED',       // Anansi aura (web-weft wonder)
   },
 };
 
