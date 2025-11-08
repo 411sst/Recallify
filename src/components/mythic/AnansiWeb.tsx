@@ -5,7 +5,6 @@
 
 import { Box } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { useAnimationQuality } from '../../stores/mythicStore';
 
 interface AnansiWebProps {
   size?: number;
@@ -14,8 +13,6 @@ interface AnansiWebProps {
 }
 
 export function AnansiWeb({ size = 100, animated = true, isVibrating = false }: AnansiWebProps) {
-  const animationQuality = useAnimationQuality();
-
   const MotionPath = motion.path;
   const MotionCircle = motion.circle;
 

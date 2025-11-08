@@ -16,7 +16,7 @@ const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft'
  * Konami Code Detector
  */
 export function useKonamiCode(onUnlock: () => void) {
-  const [keys, setKeys] = useState<string[]>([]);
+  const [_keys, setKeys] = useState<string[]>([]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -132,7 +132,7 @@ export function KonamiCodeEasterEgg() {
  * Click on specific UI elements in sequence to reveal lore
  */
 export function MythologyReferenceDetector() {
-  const [clicks, setClicks] = useState<string[]>([]);
+  const [_clicks, setClicks] = useState<string[]>([]);
   const toast = useToast();
 
   // Secret sequence: Click Kitsune icon → Phoenix icon → Anansi icon

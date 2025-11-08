@@ -60,11 +60,11 @@ export function BansheeWarning({
     }
   }, [isOpen]);
 
-  const playWail = (sev: 'whisper' | 'wail' | 'scream') => {
+  const playWail = (_sev: 'whisper' | 'wail' | 'scream') => {
     try {
       // TODO: Add actual wailing sound files
-      // const audio = new Audio(`/banshee-${sev}.mp3`);
-      // audio.volume = sev === 'scream' ? 0.5 : sev === 'wail' ? 0.3 : 0.2;
+      // const audio = new Audio(`/banshee-${_sev}.mp3`);
+      // audio.volume = _sev === 'scream' ? 0.5 : _sev === 'wail' ? 0.3 : 0.2;
       // audio.play().catch(() => console.log('Sound play failed'));
     } catch (error) {
       console.log('Banshee sound not available');

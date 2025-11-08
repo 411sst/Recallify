@@ -5,8 +5,6 @@
 
 import { useEffect } from 'react';
 import { useMythicStore } from '../stores/mythicStore';
-import badgeData from '../data/badges.json';
-import type { Badge } from '../types/mythic';
 
 /**
  * Initialize badge system on app load
@@ -17,14 +15,8 @@ export function useBadgeInitialization() {
   useEffect(() => {
     // Initialize badges from JSON if store is empty
     if (badges.length === 0) {
-      // Load badges from data file with proper typing
-      const initialBadges = badgeData.badges.map((badge) => ({
-        ...badge,
-        unlocked: false,
-        unlockedAt: undefined,
-      })) as Badge[];
-
-      // Update store (we need to add a setBadges action)
+      // TODO: Load badges from data file with proper typing
+      // Will need to add a setBadges action to the mythic store
       // For now, badges will be initialized in the store default state
     }
   }, [badges]);

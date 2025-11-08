@@ -193,7 +193,8 @@ export interface ThemeColors {
     sidebar: {
       bg: string;            // Sidebar background
       hover: string;         // Sidebar hover
-      active: string;        // Active item
+      active: string;        // Active item background
+      activeText: string;    // Active item text
       text: string;          // Sidebar text
     };
     input: {
@@ -225,6 +226,7 @@ export interface ThemeColors {
       bg: string;
       hover: string;
       active: string;
+      activeText: string;
       text: string;
     };
     input: {
