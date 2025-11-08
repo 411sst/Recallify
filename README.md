@@ -76,6 +76,19 @@ Recallify is a desktop application that combines scientifically-backed spaced re
   - Light mode uses deep primary colors for active states
   - All text maintains excellent contrast ratios
 
+### 🎮 Clash Royale Sound System (Optional)
+- **Immersive Audio Cues**: Clash Royale-themed sounds for Pomodoro events
+  - ⚔️ **Mega Knight**: "HUUUUUU MEGA KNIGHT" when work session starts
+  - 🐗 **Hog Rider**: "HOG RIDERRRR!" when short break starts
+  - ⚡ **Electro Wizard**: "ELECTRO WIZARDYYYY!" when long break starts
+  - 😂 **King Laugh**: "He-He-He-Haw!" at 1 minute left in Pomodoro
+  - 😠 **King Angry**: "GRRRR!" at 30 seconds before break ends
+  - 😭 **Goblin Cry**: Mimicking cry when session is abandoned
+- **Full Control**: Volume slider (0-100%) and enable/disable toggle
+- **Sound Testing**: Test each sound before using in settings
+- **User-Provided Assets**: Bring your own sound files (see `public/sounds/clash-royale/README.md`)
+- **Legal Compliance**: Not affiliated with Supercell, respects Fan Content Policy
+
 ---
 
 ## 🆕 What Was New in v3.2
@@ -385,6 +398,43 @@ src-tauri/target/release/bundle/
    - Click "Cancel" to stay on completion screen
 6. System notification + toast + tab flashing + sound alert
 7. Sessions automatically logged for analytics
+
+### Setting Up Clash Royale Sounds (Optional)
+
+**Note**: Sound files are **not included** due to copyright. You must obtain them yourself.
+
+1. **Obtain Sound Files**:
+   - Extract from Clash Royale game files (if permitted)
+   - Record from gameplay (ensure compliance with Supercell's Fan Content Policy)
+   - Use licensed sound effect libraries
+
+2. **Place Sound Files**:
+   - Navigate to `public/sounds/clash-royale/` directory
+   - Add these **6 files** (names must match exactly):
+     - `mega-knight.mp3` - Work session start sound
+     - `hog-rider.mp3` - Short break start sound
+     - `electro-wizard.mp3` - Long break start sound
+     - `king-laugh.mp3` - 1 minute warning sound
+     - `king-angry.mp3` - 30 second warning sound
+     - `goblin-cry.mp3` - Session abandoned sound
+   - See `public/sounds/clash-royale/README.md` for detailed requirements
+
+3. **Enable in Settings**:
+   - Go to **⚙️ Settings** → **Pomodoro Timer**
+   - Scroll to **"🎮 Clash Royale Sounds"** section
+   - Toggle **"Enable Clash Royale sounds"** to ON
+   - Adjust **volume slider** (0-100%)
+   - Use **"Test Sound"** buttons to verify each sound works
+
+4. **Sound Events**:
+   - ⚔️ **Mega Knight**: Plays when work session starts
+   - 🐗 **Hog Rider**: Plays when short break starts
+   - ⚡ **Electro Wizard**: Plays when long break starts
+   - 😂 **King Laugh**: Plays at 1 minute remaining in Pomodoro
+   - 😠 **King Angry**: Plays 30 seconds before break ends
+   - 😭 **Goblin Cry**: Plays when you abandon a session
+
+**Legal Notice**: Clash Royale is © Supercell. Recallify is not affiliated with, endorsed by, or sponsored by Supercell. Use of game assets must comply with [Supercell's Fan Content Policy](https://supercell.com/en/fan-content-policy/).
 
 ### Viewing Study Analytics
 
