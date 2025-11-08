@@ -91,6 +91,7 @@ export interface AnansiYarn {
   wrongAnswers: string[];    // Snare options (2-3)
   reward: string;            // Trickster thread message
   difficulty: 'easy' | 'medium' | 'hard';
+  moral?: string;            // Optional moral/lesson
 }
 
 export interface BansheeWarning {
