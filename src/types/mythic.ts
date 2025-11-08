@@ -16,6 +16,8 @@ export interface MythicSettings {
     kitsuneSidebar: boolean;      // 🦊 Fox-fire sidebar transformations
     phoenixLoaders: boolean;       // 🔥 Rebirth prophecy loading screens
     anansiWeb: boolean;            // 🕷️ Spider-yarn pomodoro interruptions
+    bansheeNotifications: boolean; // 👻 Ghostly streak-loss warnings
+    djinnParticles: boolean;       // 🧞 Mystical particle effects
   };
 
   // Performance settings
@@ -40,6 +42,8 @@ export const DEFAULT_MYTHIC_SETTINGS: MythicSettings = {
     kitsuneSidebar: true,
     phoenixLoaders: true,
     anansiWeb: true,
+    bansheeNotifications: true,
+    djinnParticles: true,
   },
   performance: {
     animationQuality: 'high',
@@ -89,13 +93,30 @@ export interface AnansiYarn {
   difficulty: 'easy' | 'medium' | 'hard';
 }
 
+export interface BansheeWarning {
+  id: string;
+  message: string;           // Mournful warning message
+  severity: 'whisper' | 'wail' | 'scream';  // Urgency level
+  daysUntilLoss: number;     // Days until streak breaks
+  ghostlyColor: string;      // Ethereal color scheme
+  wailSound?: string;        // Audio file path
+}
+
+export interface DjinnWish {
+  id: string;
+  wishType: 'milestone' | 'achievement' | 'streak' | 'study';
+  particleColor: string;     // Smoke wisp color
+  animation: 'grant' | 'deny' | 'pending';
+  message: string;
+}
+
 // ═══════════════════════════════════════════════════════════════
 // MYTHIC STATE MANAGEMENT
 // ═══════════════════════════════════════════════════════════════
 
 export interface MythicState {
   // Current active myth
-  activeMythFeature: 'kitsune' | 'phoenix' | 'anansi' | null;
+  activeMythFeature: 'kitsune' | 'phoenix' | 'anansi' | 'banshee' | 'djinn' | null;
 
   // Kitsune state
   kitsune: {
@@ -115,6 +136,20 @@ export interface MythicState {
     tricksterThreads: number; // Reward currency
     currentYarn: AnansiYarn | null;
   };
+
+  // Banshee state
+  banshee: {
+    warningsShown: number;    // Total warnings displayed
+    lastWarningDate: string | null;  // ISO date string
+    streaksSaved: number;     // Times user acted on warning
+  };
+
+  // Djinn state
+  djinn: {
+    wishesGranted: number;    // Milestone celebrations
+    particlesActive: boolean; // Global particle toggle
+    cursorTrailEnabled: boolean;
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -128,4 +163,38 @@ export interface MythicEvent {
   feature?: MythicFeature;
   timestamp: Date;
   data?: Record<string, unknown>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// THEME SYSTEM
+// ═══════════════════════════════════════════════════════════════
+
+export type MythicTheme = 'default' | 'kitsune-autumn' | 'phoenix-inferno' | 'anansi-twilight';
+
+export interface ThemeColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  text: string;
+  glow: string;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACHIEVEMENT BADGES
+// ═══════════════════════════════════════════════════════════════
+
+export type BadgeRarity = 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;              // Emoji or icon identifier
+  rarity: BadgeRarity;
+  unlockCondition: string;   // Human-readable
+  unlocked: boolean;
+  unlockedAt?: string;       // ISO date string
+  category: 'streak' | 'study' | 'pomodoro' | 'milestone' | 'secret';
+  mythCreature?: 'kitsune' | 'phoenix' | 'anansi' | 'banshee' | 'djinn';
 }

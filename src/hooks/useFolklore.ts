@@ -5,7 +5,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import folkloreData from '../data/folklore.json';
-import { FolkloreTale, PhoenixProphecy, AnansiYarn } from '../types/mythic';
+import { FolkloreTale, PhoenixProphecy, AnansiYarn, BansheeWarning } from '../types/mythic';
 import { useMythicStore } from '../stores/mythicStore';
 
 // ═══════════════════════════════════════════════════════════════
@@ -103,6 +103,36 @@ export const useRandomAnansiYarn = (difficulty?: 'easy' | 'medium' | 'hard'): An
 export const useAnansiRewardMessage = (): string => {
   return useMemo(() => {
     const messages = folkloreData.anansi.rewardMessages;
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    return messages[randomIndex];
+  }, []);
+};
+
+// ═══════════════════════════════════════════════════════════════
+// BANSHEE FOLKLORE
+// ═══════════════════════════════════════════════════════════════
+
+export const useBansheeWarning = (daysUntilLoss: number): BansheeWarning => {
+  return useMemo(() => {
+    const warnings = folkloreData.banshee.warnings;
+
+    // Filter by days until loss
+    const matchingWarnings = warnings.filter((w) => w.daysUntilLoss === daysUntilLoss);
+
+    if (matchingWarnings.length > 0) {
+      const randomIndex = Math.floor(Math.random() * matchingWarnings.length);
+      return matchingWarnings[randomIndex] as BansheeWarning;
+    }
+
+    // Fallback to any warning
+    const randomIndex = Math.floor(Math.random() * warnings.length);
+    return warnings[randomIndex] as BansheeWarning;
+  }, [daysUntilLoss]);
+};
+
+export const useRandomBansheeEncouragement = (): string => {
+  return useMemo(() => {
+    const messages = folkloreData.banshee.encouragementMessages;
     const randomIndex = Math.floor(Math.random() * messages.length);
     return messages[randomIndex];
   }, []);

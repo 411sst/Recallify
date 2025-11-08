@@ -5,7 +5,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { MythicSettings, MythicState, DEFAULT_MYTHIC_SETTINGS, AnansiYarn, PhoenixProphecy } from '../types/mythic';
+import { MythicSettings, MythicState, DEFAULT_MYTHIC_SETTINGS, AnansiYarn, PhoenixProphecy, BansheeWarning, MythicTheme, Badge } from '../types/mythic';
 
 interface MythicStore extends MythicSettings, MythicState {
   // ═══════════════════════════════════════════════════════════════
@@ -38,6 +38,35 @@ interface MythicStore extends MythicSettings, MythicState {
   setCurrentYarn: (yarn: AnansiYarn | null) => void;
   completeYarn: () => void;
   addTricksterThread: (amount?: number) => void;
+
+  // ═══════════════════════════════════════════════════════════════
+  // BANSHEE ACTIONS
+  // ═══════════════════════════════════════════════════════════════
+
+  showBansheeWarning: () => void;
+  saveStreak: () => void;
+
+  // ═══════════════════════════════════════════════════════════════
+  // DJINN ACTIONS
+  // ═══════════════════════════════════════════════════════════════
+
+  grantWish: () => void;
+  toggleDjinnParticles: () => void;
+  toggleCursorTrail: () => void;
+
+  // ═══════════════════════════════════════════════════════════════
+  // THEME ACTIONS
+  // ═══════════════════════════════════════════════════════════════
+
+  currentTheme: MythicTheme;
+  setTheme: (theme: MythicTheme) => void;
+
+  // ═══════════════════════════════════════════════════════════════
+  // BADGE ACTIONS
+  // ═══════════════════════════════════════════════════════════════
+
+  badges: Badge[];
+  unlockBadge: (badgeId: string) => void;
 
   // ═══════════════════════════════════════════════════════════════
   // UTILITY ACTIONS
@@ -79,6 +108,21 @@ export const useMythicStore = create<MythicStore>()(
         tricksterThreads: 0,
         currentYarn: null,
       },
+
+      banshee: {
+        warningsShown: 0,
+        lastWarningDate: null,
+        streaksSaved: 0,
+      },
+
+      djinn: {
+        wishesGranted: 0,
+        particlesActive: true,
+        cursorTrailEnabled: false,
+      },
+
+      currentTheme: 'default',
+      badges: [],
 
       // ═══════════════════════════════════════════════════════════════
       // SETTINGS ACTIONS
@@ -207,6 +251,89 @@ export const useMythicStore = create<MythicStore>()(
       },
 
       // ═══════════════════════════════════════════════════════════════
+      // BANSHEE ACTIONS
+      // ═══════════════════════════════════════════════════════════════
+
+      showBansheeWarning: () => {
+        const today = new Date().toISOString().split('T')[0];
+        set((state) => ({
+          banshee: {
+            ...state.banshee,
+            warningsShown: state.banshee.warningsShown + 1,
+            lastWarningDate: today,
+          },
+        }));
+      },
+
+      saveStreak: () => {
+        set((state) => ({
+          banshee: {
+            ...state.banshee,
+            streaksSaved: state.banshee.streaksSaved + 1,
+          },
+        }));
+      },
+
+      // ═══════════════════════════════════════════════════════════════
+      // DJINN ACTIONS
+      // ═══════════════════════════════════════════════════════════════
+
+      grantWish: () => {
+        set((state) => ({
+          djinn: {
+            ...state.djinn,
+            wishesGranted: state.djinn.wishesGranted + 1,
+          },
+        }));
+      },
+
+      toggleDjinnParticles: () => {
+        set((state) => ({
+          djinn: {
+            ...state.djinn,
+            particlesActive: !state.djinn.particlesActive,
+          },
+        }));
+      },
+
+      toggleCursorTrail: () => {
+        set((state) => ({
+          djinn: {
+            ...state.djinn,
+            cursorTrailEnabled: !state.djinn.cursorTrailEnabled,
+          },
+        }));
+      },
+
+      // ═══════════════════════════════════════════════════════════════
+      // THEME ACTIONS
+      // ═══════════════════════════════════════════════════════════════
+
+      setTheme: (theme) => {
+        set({ currentTheme: theme });
+      },
+
+      // ═══════════════════════════════════════════════════════════════
+      // BADGE ACTIONS
+      // ═══════════════════════════════════════════════════════════════
+
+      unlockBadge: (badgeId) => {
+        set((state) => {
+          const badgeIndex = state.badges.findIndex((b) => b.id === badgeId);
+          if (badgeIndex === -1) return state;
+
+          const newBadges = [...state.badges];
+          newBadges[badgeIndex] = {
+            ...newBadges[badgeIndex],
+            unlocked: true,
+            unlockedAt: new Date().toISOString(),
+          };
+
+          return { badges: newBadges };
+        });
+      },
+
+      // ═══════════════════════════════════════════════════════════════
       // UTILITY ACTIONS
       // ═══════════════════════════════════════════════════════════════
 
@@ -227,6 +354,18 @@ export const useMythicStore = create<MythicStore>()(
             tricksterThreads: 0,
             currentYarn: null,
           },
+          banshee: {
+            warningsShown: 0,
+            lastWarningDate: null,
+            streaksSaved: 0,
+          },
+          djinn: {
+            wishesGranted: 0,
+            particlesActive: true,
+            cursorTrailEnabled: false,
+          },
+          currentTheme: 'default' as MythicTheme,
+          badges: [],
         });
       },
     }),
@@ -250,7 +389,7 @@ export const useIsMythicFeatureActive = (feature: keyof MythicSettings['features
   const reducedMotion = useMythicStore((state) => state.accessibility.reducedMotion);
 
   // Respect reduced motion preference
-  if (reducedMotion && (feature === 'kitsuneSidebar' || feature === 'phoenixLoaders')) {
+  if (reducedMotion && (feature === 'kitsuneSidebar' || feature === 'phoenixLoaders' || feature === 'djinnParticles')) {
     return false;
   }
 

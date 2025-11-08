@@ -443,7 +443,12 @@ export default function PomodoroPage() {
     onAutoStartClose();
     if (nextSessionType === "work") {
       await transitionToWork();
-      await startTimer();
+      // Prompt for subject selection before starting work session
+      if (!selectedSubjectId) {
+        onSubjectSelectOpen();
+      } else {
+        await startTimer();
+      }
     } else if (nextSessionType === "short_break") {
       const newCount = state.pomodoro_count + 1;
       await transitionToBreak("short_break", newCount);
@@ -470,6 +475,10 @@ export default function PomodoroPage() {
       is_running: 0,
       pomodoro_count: count,
     });
+    // Clear subject selection when transitioning to break
+    // This ensures each new work session prompts for subject
+    setSelectedSubjectId(null);
+    setSelectedSubjectName("");
   }
 
   async function transitionToWork() {
