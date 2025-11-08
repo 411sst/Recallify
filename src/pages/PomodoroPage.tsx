@@ -27,6 +27,7 @@ import { updateDailyActivity, calculateStreaks, checkAndRecordMilestone, markMil
 import CelebrationModal from "../components/CelebrationModal";
 import { useAnansiYarn } from "../hooks/useAnansiYarn";
 import { AnansiRiddleModal } from "../components/mythic/AnansiRiddleModal";
+import { clashRoyaleSound } from "../services/clashRoyaleSound";
 
 interface PomodoroState {
   session_type: "work" | "short_break" | "long_break";
@@ -70,6 +71,11 @@ export default function PomodoroPage() {
     onClose: onCelebrationClose,
   } = useDisclosure();
   const [celebrationMilestone, setCelebrationMilestone] = useState<number | null>(null);
+
+  // Clash Royale sound warning flags
+  const [oneMinuteWarningPlayed, setOneMinuteWarningPlayed] = useState(false);
+  const [thirtySecondWarningPlayed, setThirtySecondWarningPlayed] = useState(false);
+
   const toast = useToast();
 
   // 🕷️ Anansi's Web integration
@@ -102,6 +108,23 @@ export default function PomodoroPage() {
       return () => clearInterval(interval);
     }
   }, [state.is_running]);
+
+  // 🎮 Clash Royale countdown warnings
+  useEffect(() => {
+    if (!state.is_running) return;
+
+    // 1 minute warning for Pomodoro work sessions
+    if (state.session_type === "work" && state.remaining_seconds === 60 && !oneMinuteWarningPlayed) {
+      clashRoyaleSound.play('king-laugh'); // "He-He-He-Haw!"
+      setOneMinuteWarningPlayed(true);
+    }
+
+    // 30 second warning before break ends
+    if ((state.session_type === "short_break" || state.session_type === "long_break") && state.remaining_seconds === 30 && !thirtySecondWarningPlayed) {
+      clashRoyaleSound.play('king-angry'); // "GRRRR!"
+      setThirtySecondWarningPlayed(true);
+    }
+  }, [state.is_running, state.session_type, state.remaining_seconds, oneMinuteWarningPlayed, thirtySecondWarningPlayed]);
 
   // Auto-start countdown effect
   useEffect(() => {
@@ -187,6 +210,19 @@ export default function PomodoroPage() {
         params: [Date.now()],
       });
       setState((prev) => ({ ...prev, is_running: 1 }));
+
+      // 🎮 Play Clash Royale sound based on session type
+      if (state.session_type === "work") {
+        clashRoyaleSound.play('mega-knight'); // "HUUUUUU MEGA KNIGHT"
+      } else if (state.session_type === "short_break") {
+        clashRoyaleSound.play('hog-rider'); // "HOG RIDERRRR!"
+      } else if (state.session_type === "long_break") {
+        clashRoyaleSound.play('electro-wizard'); // "ELECTRO WIZARDYYYY!"
+      }
+
+      // Reset warning flags when starting new session
+      setOneMinuteWarningPlayed(false);
+      setThirtySecondWarningPlayed(false);
     } catch (error) {
       toast({
         title: "Error starting timer",
@@ -252,6 +288,9 @@ export default function PomodoroPage() {
 
   async function endSession() {
     try {
+      // 🎮 Play Goblin Cry sound when session is abandoned
+      clashRoyaleSound.play('goblin-cry');
+
       // Stop the timer first
       await invoke("db_execute", {
         sql: "UPDATE pomodoro_state SET is_running = 0 WHERE id = 1",

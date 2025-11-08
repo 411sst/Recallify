@@ -16,10 +16,16 @@ import {
   useToast,
   Divider,
   Select,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  Tooltip,
 } from "@chakra-ui/react";
 import { getSettings, updateSetting } from "../services/database";
 import { useTheme } from "../contexts/ThemeContext";
 import { useMythicStore } from "../stores/mythicStore";
+import { clashRoyaleSound } from "../services/clashRoyaleSound";
 
 export default function SettingsPage() {
   const [intervals, setIntervals] = useState<number[]>([3, 7]);
@@ -32,6 +38,11 @@ export default function SettingsPage() {
   const [pomodoroShortBreak, setPomodoroShortBreak] = useState(5);
   const [pomodoroLongBreak, setPomodoroLongBreak] = useState(20);
   const [pomodoroSoundEnabled, setPomodoroSoundEnabled] = useState(true);
+
+  // Clash Royale sound settings
+  const [clashRoyaleEnabled, setClashRoyaleEnabled] = useState(false);
+  const [clashRoyaleVolume, setClashRoyaleVolume] = useState(80);
+  const [showVolumeTooltip, setShowVolumeTooltip] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const { isDarkMode, toggleTheme } = useTheme();
@@ -56,6 +67,11 @@ export default function SettingsPage() {
 
   useEffect(() => {
     loadSettings();
+
+    // Load Clash Royale sound settings
+    const crSettings = clashRoyaleSound.loadSettings();
+    setClashRoyaleEnabled(crSettings.enabled);
+    setClashRoyaleVolume(crSettings.volume);
   }, []);
 
   async function loadSettings() {
@@ -553,6 +569,145 @@ export default function SettingsPage() {
                   onChange={(e) => setPomodoroSoundEnabled(e.target.checked)}
                 />
               </FormControl>
+            </VStack>
+          </CardBody>
+        </Card>
+
+        {/* Clash Royale Sounds */}
+        <Card>
+          <CardBody>
+            <Heading size="md" mb={4}>
+              🎮 Clash Royale Sounds
+            </Heading>
+
+            <VStack spacing={4} align="stretch">
+              <FormControl display="flex" alignItems="center">
+                <FormLabel mb="0" flex="1">
+                  Enable Clash Royale sounds
+                </FormLabel>
+                <Switch
+                  colorScheme="primary"
+                  isChecked={clashRoyaleEnabled}
+                  onChange={(e) => {
+                    setClashRoyaleEnabled(e.target.checked);
+                    clashRoyaleSound.setEnabled(e.target.checked);
+                  }}
+                />
+              </FormControl>
+
+              <Text fontSize="sm" color="text.tertiary">
+                Immersive audio cues from Clash Royale for Pomodoro events. Sound files must be placed in <code>public/sounds/clash-royale/</code>
+              </Text>
+
+              <Divider />
+
+              <FormControl isDisabled={!clashRoyaleEnabled}>
+                <FormLabel>
+                  Volume: {clashRoyaleVolume}%
+                </FormLabel>
+                <Slider
+                  value={clashRoyaleVolume}
+                  onChange={(value) => {
+                    setClashRoyaleVolume(value);
+                    clashRoyaleSound.setVolume(value);
+                  }}
+                  min={0}
+                  max={100}
+                  step={5}
+                  onMouseEnter={() => setShowVolumeTooltip(true)}
+                  onMouseLeave={() => setShowVolumeTooltip(false)}
+                >
+                  <SliderTrack>
+                    <SliderFilledTrack bg="primary.500" />
+                  </SliderTrack>
+                  <Tooltip
+                    hasArrow
+                    bg="primary.500"
+                    color="white"
+                    placement="top"
+                    isOpen={showVolumeTooltip}
+                    label={`${clashRoyaleVolume}%`}
+                  >
+                    <SliderThumb boxSize={6} />
+                  </Tooltip>
+                </Slider>
+              </FormControl>
+
+              <Divider />
+
+              <Box>
+                <Text fontWeight="semibold" mb={2}>Test Sounds:</Text>
+                <VStack spacing={2} align="stretch">
+                  <HStack spacing={2} wrap="wrap">
+                    <Button
+                      size="sm"
+                      onClick={() => clashRoyaleSound.testSound('mega-knight')}
+                      isDisabled={!clashRoyaleEnabled}
+                      flex="1"
+                    >
+                      ⚔️ Mega Knight
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => clashRoyaleSound.testSound('hog-rider')}
+                      isDisabled={!clashRoyaleEnabled}
+                      flex="1"
+                    >
+                      🐗 Hog Rider
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => clashRoyaleSound.testSound('electro-wizard')}
+                      isDisabled={!clashRoyaleEnabled}
+                      flex="1"
+                    >
+                      ⚡ Electro Wizard
+                    </Button>
+                  </HStack>
+                  <HStack spacing={2} wrap="wrap">
+                    <Button
+                      size="sm"
+                      onClick={() => clashRoyaleSound.testSound('king-laugh')}
+                      isDisabled={!clashRoyaleEnabled}
+                      flex="1"
+                    >
+                      😂 King Laugh
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => clashRoyaleSound.testSound('king-angry')}
+                      isDisabled={!clashRoyaleEnabled}
+                      flex="1"
+                    >
+                      😠 King Angry
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => clashRoyaleSound.testSound('goblin-cry')}
+                      isDisabled={!clashRoyaleEnabled}
+                      flex="1"
+                    >
+                      😭 Goblin Cry
+                    </Button>
+                  </HStack>
+                </VStack>
+              </Box>
+
+              <Box bg="blue.50" p={3} borderRadius="md" borderLeft="4px solid" borderColor="blue.500">
+                <Text fontSize="sm" fontWeight="semibold" mb={1}>📝 Sound Events:</Text>
+                <VStack spacing={1} align="start" fontSize="xs" color="text.secondary">
+                  <Text>• Mega Knight: Work session starts</Text>
+                  <Text>• Hog Rider: Short break starts</Text>
+                  <Text>• Electro Wizard: Long break starts</Text>
+                  <Text>• King Laugh: 1 minute left in Pomodoro</Text>
+                  <Text>• King Angry: 30 seconds before break ends</Text>
+                  <Text>• Goblin Cry: Session abandoned</Text>
+                </VStack>
+              </Box>
+
+              <Text fontSize="xs" color="text.tertiary" fontStyle="italic">
+                © Supercell. Clash Royale is a trademark of Supercell. Not affiliated with or endorsed by Supercell.
+              </Text>
             </VStack>
           </CardBody>
         </Card>
