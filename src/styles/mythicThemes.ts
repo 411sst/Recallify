@@ -145,8 +145,8 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
       sidebar: {
         bg: '#2D2820',
         hover: '#3D362A',
-        active: '#FCD34D',
-        activeText: '#451A03',
+        active: '#D97706',
+        activeText: '#FFFFFF',
         text: '#EAB308',
       },
       input: {
@@ -229,8 +229,8 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
       sidebar: {
         bg: '#2D1E1E',
         hover: '#3D2626',
-        active: '#FECACA',
-        activeText: '#7F1D1D',
+        active: '#DC2626',
+        activeText: '#FFFFFF',
         text: '#F87171',
       },
       input: {
@@ -313,8 +313,8 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
       sidebar: {
         bg: '#2D293D',
         hover: '#3D394D',
-        active: '#EDE9FE',
-        activeText: '#3730A3',
+        active: '#7C3AED',
+        activeText: '#FFFFFF',
         text: '#C4B5FD',
       },
       input: {

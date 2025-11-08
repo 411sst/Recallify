@@ -1,10 +1,10 @@
-# Recallify v3.2
+# Recallify v5.0
 
-**A comprehensive study environment with spaced repetition, syllabus management, rich text editing, productivity tools, gamification, and advanced UX features.**
+**A comprehensive study environment with spaced repetition, syllabus management, rich text editing, productivity tools, gamification, and advanced UX features - now with complete theme customization!**
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-5.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 
@@ -16,7 +16,7 @@
 
 Recallify is a desktop application that combines scientifically-backed spaced repetition with modern study tools. Organize your learning with structured syllabi, take rich formatted notes, track your study time with tags and topics, build consistent study habits with streak tracking, and leverage automated revision scheduling to maximize retention.
 
-**New in v3.2:** Streak tracking with calendar heatmap, milestone celebrations, comprehensive tag management, bug fixes for better readability, and improved editing experience!
+**New in v5.0:** Complete theme system with 4 beautiful color schemes, comprehensive UI theming, optimized contrast for all themes, and seamless dark/light mode support across all themes!
 
 **Perfect for:**
 - 🎓 University students managing multiple courses
@@ -26,7 +26,59 @@ Recallify is a desktop application that combines scientifically-backed spaced re
 
 ---
 
-## 🆕 What's New in v3.2
+## 🆕 What's New in v5.0
+
+### 🎨 Complete Theme System
+- **4 Beautiful Themes**: Choose from carefully crafted color schemes
+  - **🌿 Default (Green)**: Classic Recallify with teal and green accents
+  - **🦊 Kitsune Autumn (Orange)**: Warm autumn tones with golden highlights
+  - **🔥 Phoenix Inferno (Red)**: Bold reds and fiery accents
+  - **🕷️ Anansi Twilight (Purple)**: Deep purples and mystical lavender
+- **Comprehensive Color Palettes**: 40+ UI elements themed per color scheme
+  - Backgrounds, cards, borders, text colors
+  - Input fields, buttons, hover states
+  - Sidebar, active states, navigation
+  - Status indicators, heatmap colors
+- **Seamless Dark/Light Mode**: All themes work perfectly in both modes
+  - Separate light and dark color definitions for each theme
+  - High contrast maintained across all themes
+  - WCAG AA compliant text contrast in all combinations
+
+### ✨ Theme-Aware Components
+- **Sidebar Theming**: Complete sidebar transformation
+  - Active section highlighting with theme primary colors
+  - Optimized contrast for text on colored backgrounds
+  - Hover states that match theme aesthetic
+  - White text on dark backgrounds, dark text on light backgrounds
+- **Calendar Theming**: Calendar adapts to selected theme
+  - Calendar grid background uses theme card colors
+  - Borders and hover states match theme palette
+  - Selected dates highlighted with theme colors
+  - Activity heatmap uses theme-specific color gradients
+- **Card & Container Theming**: All UI elements respond to themes
+  - Card backgrounds and hover states
+  - Border colors throughout the app
+  - Button styles (primary and secondary)
+  - Input field styling and focus states
+
+### 🔧 Theme System Features
+- **Easy Theme Switching**: Change themes from Settings > Appearance
+  - Instant theme application across entire app
+  - Theme preference persists across sessions
+  - Independent from dark/light mode toggle
+- **CSS Variable Architecture**: Modern theming implementation
+  - 30+ CSS variables for granular control
+  - Dynamic color application without reloads
+  - Consistent theming across all components
+- **Optimized Contrast**: Enhanced readability
+  - Fixed sidebar active state contrast issues
+  - Dark mode uses darker saturated colors for active states
+  - Light mode uses deep primary colors for active states
+  - All text maintains excellent contrast ratios
+
+---
+
+## 🆕 What Was New in v3.2
 
 ### 🔥 Streak Tracking & Gamification
 - **Daily Streak Counter**: Track consecutive days of study
@@ -253,8 +305,8 @@ npm run tauri:build
 **Installers will be created in:**
 ```
 src-tauri/target/release/bundle/
-├── nsis/Recallify_2.0.0_x64-setup.exe  (Windows)
-└── msi/Recallify_2.0.0_x64_en-US.msi   (Windows)
+├── nsis/Recallify_5.0.0_x64-setup.exe  (Windows)
+└── msi/Recallify_5.0.0_x64_en-US.msi   (Windows)
 ```
 
 ---
@@ -309,6 +361,18 @@ src-tauri/target/release/bundle/
 4. Select PDF file (max 50MB)
 5. Click **"View"** to open in full-screen viewer
 6. Delete anytime with 🗑️ button
+
+### Changing Themes
+
+1. Go to **⚙️ Settings** in sidebar
+2. Navigate to **Appearance** section
+3. Under **Color Theme**, select from dropdown:
+   - **Default (Green)** - Classic Recallify
+   - **🦊 Kitsune Autumn (Orange)** - Warm autumn tones
+   - **🔥 Phoenix Inferno (Red)** - Bold fiery colors
+   - **🕷️ Anansi Twilight (Purple)** - Mystical purples
+4. Theme applies instantly across entire app
+5. Works with both Light and Dark modes
 
 ### Using the Pomodoro Timer
 
@@ -486,19 +550,23 @@ C:\Users\YourName\AppData\Local\Recallify\
 
 ## 🎨 Design System
 
-### Color Palette
+### Color Palettes
 
-**Light Mode:**
-- Primary: Dark Green (#005108)
-- Accent: Teal (#1EA896)
-- Background: Off-White (#FBFFF1)
-- Text: Dark Navy (#0A122A)
+**🌿 Default Theme (Green):**
+- Light: Dark Green (#005108) & Teal (#1EA896) on Off-White (#FBFFF1)
+- Dark: Teal (#1EA896) on Dark Navy (#0A122A)
 
-**Dark Mode:**
-- Primary: Teal (#1EA896)
-- Accent: Light Teal (#2DD4BF)
-- Background: Dark Navy (#0A122A)
-- Text: Off-White (#FBFFF1)
+**🦊 Kitsune Autumn (Orange):**
+- Light: Burnt Sienna (#B45309) & Amber (#F59E0B) on Cream (#FDF4F3)
+- Dark: Amber (#D97706) on Dark Brown (#1F1A14)
+
+**🔥 Phoenix Inferno (Red):**
+- Light: Crimson (#B91C1C) & Red (#EF4444) on Light Rose (#FEF7F6)
+- Dark: Red (#DC2626) on Dark Burgundy (#1E1818)
+
+**🕷️ Anansi Twilight (Purple):**
+- Light: Deep Purple (#6D28D9) & Violet (#8B5CF6) on Lavender (#FCFCFF)
+- Dark: Purple (#7C3AED) on Dark Indigo (#1E1B2A)
 
 ### Status Colors
 - ✅ Completed: Teal (#1EA896)
@@ -510,7 +578,16 @@ C:\Users\YourName\AppData\Local\Recallify\
 
 ## 🚧 Roadmap
 
-### ✅ v3.2 (Current Release - Complete!)
+### ✅ v5.0 (Current Release - Complete!)
+- [x] Complete theme system with 4 color schemes
+- [x] Comprehensive UI theming (40+ CSS variables)
+- [x] Theme-aware sidebar with optimized contrast
+- [x] Theme-aware calendar and heatmap colors
+- [x] Seamless dark/light mode support for all themes
+- [x] Theme preference persistence
+- [x] Enhanced contrast for accessibility (WCAG AA compliant)
+
+### ✅ v3.2 (Released)
 - [x] Streak tracking with calendar heatmap
 - [x] Milestone celebrations (7, 14, 30, 50, 100, 180, 365 days)
 - [x] Tag management dashboard with filtering
@@ -531,24 +608,25 @@ C:\Users\YourName\AppData\Local\Recallify\
 - [x] Study analytics dashboard (time per subject, charts)
 - [x] Pomodoro history log page
 
-### v3.3 (Next Release)
+### v5.1 (Next Release)
 - [ ] Search across all notes and subjects
 - [ ] Export individual notes to PDF/Markdown
 - [ ] Tag editing and merging capabilities
 - [ ] Custom streak goals and reminders
 
-### v3.4 (Future)
+### v5.2 (Future)
 - [ ] Export system (PDF, Markdown, HTML, JSON)
 - [ ] Automated backup/restore
-- [ ] Custom themes and color schemes
+- [ ] Custom theme creator (user-defined color schemes)
 - [ ] Flashcard mode from notes
 
-### v4.0 (Long-term)
+### v6.0 (Long-term)
 - [ ] Cloud sync & multi-device
 - [ ] Mobile apps (iOS/Android)
 - [ ] Collaboration features
 - [ ] AI-powered study suggestions
 - [ ] Web clipper extension
+- [ ] Mythic Mode with gamification features
 
 ---
 
