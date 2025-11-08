@@ -16,8 +16,8 @@ interface PhoenixFlameProps {
 
 export function PhoenixFlame({
   size = 80,
-  color = '#F39C12',
-  intensity = 'medium',
+  color: _color = '#F39C12',
+  intensity: _intensity = 'medium',
   animated = true,
 }: PhoenixFlameProps) {
   const animationQuality = useAnimationQuality();

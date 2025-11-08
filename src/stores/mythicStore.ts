@@ -5,7 +5,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { MythicSettings, MythicState, DEFAULT_MYTHIC_SETTINGS, AnansiYarn, PhoenixProphecy, BansheeWarning, MythicTheme, Badge } from '../types/mythic';
+import { MythicSettings, MythicState, DEFAULT_MYTHIC_SETTINGS, AnansiYarn, PhoenixProphecy, MythicTheme, Badge } from '../types/mythic';
 
 interface MythicStore extends MythicSettings, MythicState {
   // ═══════════════════════════════════════════════════════════════
@@ -83,7 +83,7 @@ const prefersReducedMotion = (): boolean => {
 
 export const useMythicStore = create<MythicStore>()(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       // ═══════════════════════════════════════════════════════════════
       // INITIAL STATE
       // ═══════════════════════════════════════════════════════════════

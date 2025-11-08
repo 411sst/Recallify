@@ -40,7 +40,7 @@ export default function Sidebar() {
   const textColor = "var(--theme-sidebar-text)";
   const hoverBg = "var(--theme-sidebar-hover)";
   const activeBg = "var(--theme-sidebar-active)";
-  const activeColor = "var(--theme-sidebar-active)";
+  const activeColor = "var(--theme-sidebar-active-text)";
 
   // Memoized load function with debouncing
   const loadDueCount = useCallback(async () => {

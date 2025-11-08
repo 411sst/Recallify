@@ -10,7 +10,7 @@ import type { MythicTheme, ThemeColors } from '../types/mythic';
 // ═══════════════════════════════════════════════════════════════
 
 export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
-  // 🌿 DEFAULT THEME (Green)
+  // 🌿 DEFAULT THEME (Green) - Original Recallify colors
   default: {
     primary: '#005108',
     secondary: '#1EA896',
@@ -21,21 +21,22 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
       background: '#FBFFF1',
       cardBg: '#FFFFFF',
       cardHover: '#F0FDF4',
-      border: '#BBF7D0',
+      border: '#E5E7EB',
       text: {
         primary: '#0A122A',
         secondary: '#2F2F2F',
         tertiary: '#6B6B6B',
       },
       sidebar: {
-        bg: '#F0FDF4',
-        hover: '#DCFCE7',
+        bg: '#FFFFFF',
+        hover: '#F9FAFB',
         active: '#005108',
+        activeText: '#FFFFFF',
         text: '#2F2F2F',
       },
       input: {
         bg: '#FFFFFF',
-        border: '#BBF7D0',
+        border: '#E5E7EB',
         borderFocus: '#005108',
       },
       button: {
@@ -43,7 +44,7 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
         primaryText: '#FFFFFF',
         primaryHover: '#004106',
         secondaryBorder: '#005108',
-        secondaryHover: '#DCFCE7',
+        secondaryHover: '#F0FDF4',
       },
     },
 
@@ -51,7 +52,7 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
       background: '#0A122A',
       cardBg: '#1F2937',
       cardHover: '#374151',
-      border: '#BBF7D0',
+      border: '#374151',
       text: {
         primary: '#FBFFF1',
         secondary: '#D1D5DB',
@@ -60,19 +61,20 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
       sidebar: {
         bg: '#1F2937',
         hover: '#374151',
-        active: '#BBF7D0',
+        active: '#1EA896',
+        activeText: '#FFFFFF',
         text: '#D1D5DB',
       },
       input: {
         bg: '#374151',
-        border: '#BBF7D0',
-        borderFocus: '#005108',
+        border: '#4B5563',
+        borderFocus: '#1EA896',
       },
       button: {
-        primaryBg: '#BBF7D0',
-        primaryText: '#0A122A',
-        primaryHover: '#86EFAC',
-        secondaryBorder: '#BBF7D0',
+        primaryBg: '#1EA896',
+        primaryText: '#FFFFFF',
+        primaryHover: '#188577',
+        secondaryBorder: '#1EA896',
         secondaryHover: '#374151',
       },
     },
@@ -85,9 +87,9 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
     },
 
     heatmap: {
-      none: '#F0FDF4',
-      low: '#DCFCE7',
-      medium: '#BBF7D0',
+      none: '#EBEDF0',
+      low: '#9BE9A8',
+      medium: '#40C463',
       high: '#005108',
     },
   },
@@ -113,6 +115,7 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
         bg: '#FEF3C7',
         hover: '#FCD34D',
         active: '#B45309',
+        activeText: '#FFFFFF',
         text: '#92400E',
       },
       input: {
@@ -143,6 +146,7 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
         bg: '#2D2820',
         hover: '#3D362A',
         active: '#FCD34D',
+        activeText: '#451A03',
         text: '#EAB308',
       },
       input: {
@@ -195,6 +199,7 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
         bg: '#FEE2E2',
         hover: '#FECACA',
         active: '#B91C1C',
+        activeText: '#FFFFFF',
         text: '#991B1B',
       },
       input: {
@@ -225,6 +230,7 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
         bg: '#2D1E1E',
         hover: '#3D2626',
         active: '#FECACA',
+        activeText: '#7F1D1D',
         text: '#F87171',
       },
       input: {
@@ -277,6 +283,7 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
         bg: '#F3F4FF',
         hover: '#EDE9FE',
         active: '#6D28D9',
+        activeText: '#FFFFFF',
         text: '#6366F1',
       },
       input: {
@@ -307,6 +314,7 @@ export const MYTHIC_THEME_COLORS: Record<MythicTheme, ThemeColors> = {
         bg: '#2D293D',
         hover: '#3D394D',
         active: '#EDE9FE',
+        activeText: '#3730A3',
         text: '#C4B5FD',
       },
       input: {
@@ -373,6 +381,7 @@ export function applyMythicTheme(themeName: MythicTheme, isDarkMode: boolean = f
   root.style.setProperty('--theme-sidebar-bg', mode.sidebar.bg);
   root.style.setProperty('--theme-sidebar-hover', mode.sidebar.hover);
   root.style.setProperty('--theme-sidebar-active', mode.sidebar.active);
+  root.style.setProperty('--theme-sidebar-active-text', mode.sidebar.activeText);
   root.style.setProperty('--theme-sidebar-text', mode.sidebar.text);
 
   // Input colors
