@@ -15,6 +15,7 @@ import {
   Text,
   useToast,
   Divider,
+  Select,
 } from "@chakra-ui/react";
 import { getSettings, updateSetting } from "../services/database";
 import { useTheme } from "../contexts/ThemeContext";
@@ -42,10 +43,15 @@ export default function SettingsPage() {
     features,
     performance,
     accessibility,
+    djinn,
+    currentTheme,
     toggleMythicMode,
     toggleFeature,
     updatePerformance,
     updateAccessibility,
+    toggleDjinnParticles,
+    toggleCursorTrail,
+    setTheme,
   } = useMythicStore();
 
   useEffect(() => {
@@ -250,8 +256,99 @@ export default function SettingsPage() {
                         onChange={() => toggleFeature('anansiWeb')}
                       />
                     </FormControl>
+
+                    <FormControl display="flex" alignItems="center">
+                      <FormLabel mb="0" flex="1" fontSize="sm">
+                        👻 Banshee Notifications <Text as="span" fontSize="xs" color="text.tertiary">(Streak warnings)</Text>
+                      </FormLabel>
+                      <Switch
+                        colorScheme="purple"
+                        size="sm"
+                        isChecked={features.bansheeNotifications}
+                        onChange={() => toggleFeature('bansheeNotifications')}
+                      />
+                    </FormControl>
+
+                    <FormControl display="flex" alignItems="center">
+                      <FormLabel mb="0" flex="1" fontSize="sm">
+                        🧞 Djinn Particles <Text as="span" fontSize="xs" color="text.tertiary">(Mystical smoke effects)</Text>
+                      </FormLabel>
+                      <Switch
+                        colorScheme="purple"
+                        size="sm"
+                        isChecked={features.djinnParticles}
+                        onChange={() => toggleFeature('djinnParticles')}
+                      />
+                    </FormControl>
                   </VStack>
                 </Box>
+
+                <Divider />
+
+                {/* Theme Selector */}
+                <Box>
+                  <Text fontWeight="semibold" mb={2} fontSize="sm" color="text.secondary">
+                    🎨 Mythic Theme
+                  </Text>
+
+                  <FormControl>
+                    <Select
+                      value={currentTheme}
+                      onChange={(e) => setTheme(e.target.value as any)}
+                      colorScheme="purple"
+                      size="sm"
+                    >
+                      <option value="default">Default (Green)</option>
+                      <option value="kitsune-autumn">🦊 Kitsune Autumn (Orange)</option>
+                      <option value="phoenix-inferno">🔥 Phoenix Inferno (Red)</option>
+                      <option value="anansi-twilight">🕷️ Anansi Twilight (Purple)</option>
+                    </Select>
+                    <Text fontSize="xs" color="text.tertiary" mt={1}>
+                      Change the color palette of the entire app
+                    </Text>
+                  </FormControl>
+                </Box>
+
+                <Divider />
+
+                {/* Extended Djinn Settings */}
+                {features.djinnParticles && (
+                  <>
+                    <Box>
+                      <Text fontWeight="semibold" mb={2} fontSize="sm" color="text.secondary">
+                        🧞 Djinn Effects
+                      </Text>
+
+                      <VStack spacing={3} align="stretch">
+                        <FormControl display="flex" alignItems="center">
+                          <FormLabel mb="0" flex="1" fontSize="sm">
+                            Ambient Smoke Wisps
+                          </FormLabel>
+                          <Switch
+                            colorScheme="purple"
+                            size="sm"
+                            isChecked={djinn.particlesActive}
+                            onChange={toggleDjinnParticles}
+                          />
+                        </FormControl>
+
+                        <FormControl display="flex" alignItems="center">
+                          <FormLabel mb="0" flex="1" fontSize="sm">
+                            Cursor Trail
+                          </FormLabel>
+                          <Switch
+                            colorScheme="purple"
+                            size="sm"
+                            isChecked={djinn.cursorTrailEnabled}
+                            onChange={toggleCursorTrail}
+                          />
+                        </FormControl>
+                      </VStack>
+                    </Box>
+
+                    <Divider />
+                  </>
+                )}
 
                 <Divider />
 

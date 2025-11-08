@@ -5,7 +5,7 @@
 
 import { Tooltip, TooltipProps, Box, Text } from '@chakra-ui/react';
 import { ReactNode } from 'react';
-import { useKitsuneHaikus } from '../../hooks/useFolklore';
+import { useKitsuneHaikus, useCurrentKitsuneHaiku } from '../../hooks/useFolklore';
 import { useIsMythicFeatureActive, useMythicStore } from '../../stores/mythicStore';
 
 interface KitsuneHaikuTooltipProps extends Omit<TooltipProps, 'label'> {
@@ -86,7 +86,9 @@ export function KitsuneHaikuTooltip({
       placement="right"
       closeOnMouseDown
       closeOnScroll
+      closeOnClick
       closeDelay={0}
+      openDelay={300}
       {...tooltipProps}
     >
       {children}

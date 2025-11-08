@@ -30,25 +30,42 @@ export function PhoenixLoader({
   const prophecy = usePhoenixProphecy(sessionContext);
   const { incrementRebornCount } = useMythicStore();
   const [hasCompleted, setHasCompleted] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
+  const [loadStartTime, setLoadStartTime] = useState<number | null>(null);
 
   const bgColor = useColorModeValue('rgba(255, 255, 255, 0.95)', 'rgba(26, 26, 26, 0.95)');
   const textColor = useColorModeValue('gray.700', 'gray.200');
 
-  useEffect(() => {
-    if (!isLoading && !hasCompleted && isActive && showConfetti) {
-      setHasCompleted(true);
-      triggerRebirthConfetti();
-      incrementRebornCount();
-      onLoadComplete?.();
-    }
-  }, [isLoading, hasCompleted, isActive, showConfetti, incrementRebornCount, onLoadComplete]);
+  const MIN_DISPLAY_TIME = 2000; // 2 seconds minimum to see prophecy
 
-  // Reset completion state when loading starts again
+  // Track when loading starts
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading && isActive) {
+      setLoadStartTime(Date.now());
+      setShowLoader(true);
       setHasCompleted(false);
     }
-  }, [isLoading]);
+  }, [isLoading, isActive]);
+
+  // Handle loading completion with minimum display time
+  useEffect(() => {
+    if (!isLoading && showLoader && !hasCompleted && isActive && loadStartTime) {
+      const elapsed = Date.now() - loadStartTime;
+      const remaining = Math.max(0, MIN_DISPLAY_TIME - elapsed);
+
+      const timer = setTimeout(() => {
+        setHasCompleted(true);
+        setShowLoader(false);
+        if (showConfetti) {
+          triggerRebirthConfetti();
+          incrementRebornCount();
+        }
+        onLoadComplete?.();
+      }, remaining);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, showLoader, hasCompleted, isActive, showConfetti, incrementRebornCount, onLoadComplete, loadStartTime]);
 
   // Don't show loader if mythic mode is off
   if (!isActive) {
@@ -75,7 +92,7 @@ export function PhoenixLoader({
 
   return (
     <AnimatePresence>
-      {isLoading && (
+      {showLoader && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
