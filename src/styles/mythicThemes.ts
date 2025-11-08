@@ -123,8 +123,20 @@ export function applyMythicTheme(themeName: MythicTheme): void {
   const root = document.documentElement;
   const colors = MYTHIC_THEME_COLORS[themeName];
 
+  // Set main colors
   root.style.setProperty('--mythic-primary', colors.primary);
   root.style.setProperty('--mythic-secondary', colors.secondary);
   root.style.setProperty('--mythic-accent', colors.accent);
   root.style.setProperty('--mythic-glow', colors.glow);
+
+  // Set color gradients for primary shades (50-900)
+  root.style.setProperty('--mythic-primary-50', lighten(colors.primary, 0.4));
+  root.style.setProperty('--mythic-primary-100', lighten(colors.primary, 0.3));
+  root.style.setProperty('--mythic-primary-200', lighten(colors.primary, 0.2));
+  root.style.setProperty('--mythic-primary-300', lighten(colors.primary, 0.1));
+  root.style.setProperty('--mythic-primary-400', lighten(colors.primary, 0.05));
+  root.style.setProperty('--mythic-primary-600', darken(colors.primary, 0.1));
+  root.style.setProperty('--mythic-primary-700', darken(colors.primary, 0.2));
+  root.style.setProperty('--mythic-primary-800', darken(colors.primary, 0.3));
+  root.style.setProperty('--mythic-primary-900', darken(colors.primary, 0.4));
 }

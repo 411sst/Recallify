@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect } from "react";
 import { useColorMode } from "@chakra-ui/react";
 import { getSettings, updateSetting } from "../services/database";
+import { useMythicStore } from "../stores/mythicStore";
+import { applyMythicTheme } from "../styles/mythicThemes";
 
 interface ThemeContextType {
   isDarkMode: boolean;
@@ -12,10 +14,21 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { colorMode, setColorMode } = useColorMode();
   const isDarkMode = colorMode === "dark";
+  const { enabled: mythicEnabled, currentTheme } = useMythicStore();
 
   useEffect(() => {
     loadTheme();
   }, []);
+
+  // Apply mythic theme colors when theme changes
+  useEffect(() => {
+    if (mythicEnabled && currentTheme) {
+      applyMythicTheme(currentTheme);
+    } else {
+      // Reset to default theme
+      applyMythicTheme('default');
+    }
+  }, [mythicEnabled, currentTheme]);
 
   async function loadTheme() {
     try {

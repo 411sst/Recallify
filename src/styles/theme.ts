@@ -9,19 +9,19 @@ const theme = extendTheme({
   config,
   colors: {
     primary: {
-      50: "#e6f3e7",
-      100: "#c0dfc2",
-      200: "#99cb9c",
-      300: "#73b775",
-      400: "#4da34f",
-      500: "#005108", // Main dark green
-      600: "#004107",
-      700: "#003105",
-      800: "#002004",
-      900: "#001002",
+      50: "var(--mythic-primary-50, #e6f3e7)",
+      100: "var(--mythic-primary-100, #c0dfc2)",
+      200: "var(--mythic-primary-200, #99cb9c)",
+      300: "var(--mythic-primary-300, #73b775)",
+      400: "var(--mythic-primary-400, #4da34f)",
+      500: "var(--mythic-primary, #005108)", // Main - uses CSS variable
+      600: "var(--mythic-primary-600, #004107)",
+      700: "var(--mythic-primary-700, #003105)",
+      800: "var(--mythic-primary-800, #002004)",
+      900: "var(--mythic-primary-900, #001002)",
     },
     teal: {
-      500: "#1EA896", // Main teal accent
+      500: "var(--mythic-secondary, #1EA896)", // Main teal accent - uses CSS variable
       600: "#188577",
       700: "#126358",
     },
@@ -36,7 +36,7 @@ const theme = extendTheme({
     },
     status: {
       success: "#1EA896", // Teal
-      due: "#F59E0B", // Orange/Amber
+      due: "var(--mythic-accent, #F59E0B)", // Orange/Amber - uses CSS variable
       overdue: "#DC2626", // Red
       future: "#3B82F6", // Blue
     },

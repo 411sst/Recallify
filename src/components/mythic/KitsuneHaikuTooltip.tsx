@@ -87,8 +87,10 @@ export function KitsuneHaikuTooltip({
       closeOnMouseDown
       closeOnScroll
       closeOnClick
+      closeOnPointerDown
       closeDelay={0}
       openDelay={300}
+      shouldWrapChildren
       {...tooltipProps}
     >
       {children}

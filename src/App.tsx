@@ -18,7 +18,6 @@ import SpotifyButton from "./components/spotify/SpotifyButton";
 import { updateOverdueRevisions } from "./services/database";
 import { useMythicSync } from "./hooks/useMythicSync";
 import { DjinnCursorTrail } from "./components/mythic/DjinnCursorTrail";
-import { PageTransition } from "./components/mythic/PageTransition";
 import { KonamiCodeEasterEgg } from "./components/mythic/EasterEggs";
 
 function App() {
@@ -41,22 +40,20 @@ function App() {
     <Box display="flex" minH="100vh">
       <Sidebar />
       <Box flex="1" p={8} overflowY="auto">
-        <PageTransition>
-          <Routes>
-            <Route path="/" element={<SubjectsPage />} />
-            <Route path="/subjects/:id" element={<SubjectDetailPage />} />
-            <Route path="/pomodoro" element={<PomodoroPage />} />
-            <Route path="/streaks" element={<StreakPage />} />
-            <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route path="/pomodoro-history" element={<PomodoroHistoryPage />} />
-            <Route path="/tags" element={<TagManagementPage />} />
-            <Route path="/calendar" element={<CalendarPage />} />
-            <Route path="/history" element={<HistoryPage />} />
-            <Route path="/badges" element={<BadgesPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/spotify-callback" element={<SpotifyCallbackPage />} />
-          </Routes>
-        </PageTransition>
+        <Routes>
+          <Route path="/" element={<SubjectsPage />} />
+          <Route path="/subjects/:id" element={<SubjectDetailPage />} />
+          <Route path="/pomodoro" element={<PomodoroPage />} />
+          <Route path="/streaks" element={<StreakPage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/pomodoro-history" element={<PomodoroHistoryPage />} />
+          <Route path="/tags" element={<TagManagementPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/badges" element={<BadgesPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/spotify-callback" element={<SpotifyCallbackPage />} />
+        </Routes>
       </Box>
       <SpotifyButton />
 
