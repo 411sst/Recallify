@@ -1,7 +1,7 @@
 {
   "name": "recallify",
-  "version": "4.0.0",
-  "description": "A comprehensive study environment with spaced repetition, syllabus management, rich text editing, productivity tools, gamification, and advanced UX features",
+  "version": "5.0.0",
+  "description": "A comprehensive study environment with spaced repetition, syllabus management, rich text editing, productivity tools, gamification, and advanced UX features - now with complete theme customization",
   "type": "module",
   "scripts": {
     "dev": "vite",
