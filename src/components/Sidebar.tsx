@@ -16,6 +16,7 @@ const menuItems = [
   { path: "/tags", label: "Tags", icon: "🏷️" },
   { path: "/calendar", label: "Calendar", icon: "📅" },
   { path: "/history", label: "History", icon: "📜" },
+  { path: "/badges", label: "Badges", icon: "🏆" },
   { path: "/settings", label: "Settings", icon: "⚙️" },
 ];
 
