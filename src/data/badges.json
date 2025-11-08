@@ -1,0 +1,224 @@
+{
+  "badges": [
+    {
+      "id": "first-steps",
+      "name": "First Steps",
+      "description": "Complete your first study session",
+      "icon": "👣",
+      "rarity": "common",
+      "unlockCondition": "Complete 1 study entry",
+      "unlocked": false,
+      "category": "study",
+      "mythCreature": null
+    },
+    {
+      "id": "week-warrior",
+      "name": "Week Warrior",
+      "description": "Maintain a 7-day study streak",
+      "icon": "🔥",
+      "rarity": "common",
+      "unlockCondition": "Achieve a 7-day streak",
+      "unlocked": false,
+      "category": "streak",
+      "mythCreature": null
+    },
+    {
+      "id": "kitsune-apprentice",
+      "name": "Kitsune Apprentice",
+      "description": "Unlock the first fox tail",
+      "icon": "🦊",
+      "rarity": "rare",
+      "unlockCondition": "Reach 7-day streak (1 tail)",
+      "unlocked": false,
+      "category": "streak",
+      "mythCreature": "kitsune"
+    },
+    {
+      "id": "nine-tail-master",
+      "name": "Nine-Tail Master",
+      "description": "Achieve ultimate fox-spirit enlightenment",
+      "icon": "🌟",
+      "rarity": "legendary",
+      "unlockCondition": "Reach 63-day streak (9 tails)",
+      "unlocked": false,
+      "category": "streak",
+      "mythCreature": "kitsune"
+    },
+    {
+      "id": "phoenix-reborn",
+      "name": "Phoenix Reborn",
+      "description": "Experience your first rebirth through study",
+      "icon": "🔥",
+      "rarity": "rare",
+      "unlockCondition": "Complete first loading prophecy",
+      "unlocked": false,
+      "category": "milestone",
+      "mythCreature": "phoenix"
+    },
+    {
+      "id": "eternal-flame",
+      "name": "Eternal Flame",
+      "description": "Rise from ashes 100 times",
+      "icon": "🕊️",
+      "rarity": "epic",
+      "unlockCondition": "Complete 100 loading prophecies",
+      "unlocked": false,
+      "category": "milestone",
+      "mythCreature": "phoenix"
+    },
+    {
+      "id": "anansi-initiate",
+      "name": "Anansi's Initiate",
+      "description": "Solve your first spider-yarn riddle",
+      "icon": "🕷️",
+      "rarity": "rare",
+      "unlockCondition": "Solve 1 Anansi riddle",
+      "unlocked": false,
+      "category": "study",
+      "mythCreature": "anansi"
+    },
+    {
+      "id": "web-master",
+      "name": "Web Master",
+      "description": "Collect 100 trickster threads",
+      "icon": "🕸️",
+      "rarity": "epic",
+      "unlockCondition": "Earn 100 trickster threads",
+      "unlocked": false,
+      "category": "study",
+      "mythCreature": "anansi"
+    },
+    {
+      "id": "banshee-survivor",
+      "name": "Banshee Survivor",
+      "description": "Heed the banshee's warning and save your streak",
+      "icon": "👻",
+      "rarity": "rare",
+      "unlockCondition": "Save streak after banshee warning",
+      "unlocked": false,
+      "category": "streak",
+      "mythCreature": "banshee"
+    },
+    {
+      "id": "death-defier",
+      "name": "Death Defier",
+      "description": "Save your streak 10 times from the brink",
+      "icon": "💀",
+      "rarity": "epic",
+      "unlockCondition": "Save streak 10 times",
+      "unlocked": false,
+      "category": "streak",
+      "mythCreature": "banshee"
+    },
+    {
+      "id": "wish-granted",
+      "name": "Wish Granted",
+      "description": "The Djinn grants your first wish",
+      "icon": "🧞",
+      "rarity": "rare",
+      "unlockCondition": "Reach first milestone with Djinn active",
+      "unlocked": false,
+      "category": "milestone",
+      "mythCreature": "djinn"
+    },
+    {
+      "id": "thousand-wishes",
+      "name": "Thousand Wishes",
+      "description": "A legendary bond with the Djinn",
+      "icon": "⭐",
+      "rarity": "legendary",
+      "unlockCondition": "Reach 100 milestones",
+      "unlocked": false,
+      "category": "milestone",
+      "mythCreature": "djinn"
+    },
+    {
+      "id": "pomodoro-prodigy",
+      "name": "Pomodoro Prodigy",
+      "description": "Complete 25 Pomodoro sessions",
+      "icon": "🍅",
+      "rarity": "common",
+      "unlockCondition": "Complete 25 Pomodoros",
+      "unlocked": false,
+      "category": "pomodoro",
+      "mythCreature": null
+    },
+    {
+      "id": "century-scholar",
+      "name": "Century Scholar",
+      "description": "Create 100 study entries",
+      "icon": "📚",
+      "rarity": "epic",
+      "unlockCondition": "Create 100 entries",
+      "unlocked": false,
+      "category": "study",
+      "mythCreature": null
+    },
+    {
+      "id": "mythic-collector",
+      "name": "Mythic Collector",
+      "description": "Unlock all 5 mythic creature badges",
+      "icon": "🏆",
+      "rarity": "mythic",
+      "unlockCondition": "Unlock one badge from each creature",
+      "unlocked": false,
+      "category": "secret",
+      "mythCreature": null
+    },
+    {
+      "id": "konami-keeper",
+      "name": "Konami Keeper",
+      "description": "Discovered the secret code...",
+      "icon": "🎮",
+      "rarity": "mythic",
+      "unlockCondition": "Input Konami code",
+      "unlocked": false,
+      "category": "secret",
+      "mythCreature": null
+    },
+    {
+      "id": "speed-demon",
+      "name": "Speed Demon",
+      "description": "Complete 10 Pomodoros in one day",
+      "icon": "⚡",
+      "rarity": "rare",
+      "unlockCondition": "Complete 10 Pomodoros in 24 hours",
+      "unlocked": false,
+      "category": "pomodoro",
+      "mythCreature": null
+    },
+    {
+      "id": "night-owl",
+      "name": "Night Owl",
+      "description": "Study past midnight",
+      "icon": "🦉",
+      "rarity": "common",
+      "unlockCondition": "Create entry after 11 PM",
+      "unlocked": false,
+      "category": "secret",
+      "mythCreature": null
+    },
+    {
+      "id": "early-bird",
+      "name": "Early Bird",
+      "description": "Study before sunrise",
+      "icon": "🌅",
+      "rarity": "common",
+      "unlockCondition": "Create entry before 6 AM",
+      "unlocked": false,
+      "category": "secret",
+      "mythCreature": null
+    },
+    {
+      "id": "dedication-deity",
+      "name": "Dedication Deity",
+      "description": "The gods themselves bow to your persistence",
+      "icon": "🌟",
+      "rarity": "mythic",
+      "unlockCondition": "Reach 365-day streak",
+      "unlocked": false,
+      "category": "streak",
+      "mythCreature": null
+    }
+  ]
+}

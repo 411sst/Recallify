@@ -245,6 +245,53 @@
     ]
   },
 
+  "banshee": {
+    "warnings": [
+      {
+        "id": "banshee-001",
+        "message": "The banshee wails at dusk... Your study-flame flickers. One more dawn untouched, and your streak shall shatter like frost.",
+        "severity": "whisper",
+        "daysUntilLoss": 1,
+        "ghostlyColor": "#8B9DC3"
+      },
+      {
+        "id": "banshee-002",
+        "message": "A mournful cry echoes through the void... The pale lady mourns what hasn't yet died. Will you let your dedication perish?",
+        "severity": "wail",
+        "daysUntilLoss": 1,
+        "ghostlyColor": "#A5B8CF"
+      },
+      {
+        "id": "banshee-003",
+        "message": "She keens for the fallen streak... Tonight is your last chance. Study before midnight, or the chain breaks and the banshee claims her due.",
+        "severity": "scream",
+        "daysUntilLoss": 0,
+        "ghostlyColor": "#7A8BA1"
+      },
+      {
+        "id": "banshee-004",
+        "message": "The ghostly herald appears... Tread carefully, scholar. Your flame of persistence grows dim. Reignite it, lest she sing your ending.",
+        "severity": "whisper",
+        "daysUntilLoss": 1,
+        "ghostlyColor": "#9EAFC7"
+      },
+      {
+        "id": "banshee-005",
+        "message": "Ethereal sorrow fills the air... The harbinger mourns prematurely. Prove her wrong—study now and silence her wail!",
+        "severity": "wail",
+        "daysUntilLoss": 0,
+        "ghostlyColor": "#8497B0"
+      }
+    ],
+    "encouragementMessages": [
+      "The banshee's cry fades to silence... You've proven your resolve. Your streak lives another day!",
+      "She retreats into the mist, impressed... Your dedication has banished the specter of failure.",
+      "The wailing ceases—replaced by respectful silence... Even death's herald honors your persistence.",
+      "The pale lady nods and vanishes... Your study-flame burns too bright for her to claim.",
+      "Ghostly acknowledgment granted... The banshee's warning was heeded. Your chain remains unbroken!"
+    ]
+  },
+
   "general": {
     "mythicQuotes": [
       "The fox learns by moonlight what the owl teaches at dusk.",
