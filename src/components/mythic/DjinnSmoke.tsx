@@ -97,7 +97,7 @@ export function DjinnSmoke({
  */
 export function DjinnAmbientSmoke({ intensity = 'low' }: { intensity?: 'low' | 'medium' | 'high' }) {
   const isActive = useIsMythicFeatureActive('djinnParticles');
-  const { particlesActive } = useMythicStore();
+  const { djinn } = useMythicStore();
   const shouldRender = useShouldRenderParticles();
 
   const count = intensity === 'high' ? 8 : intensity === 'medium' ? 5 : 3;
@@ -111,7 +111,7 @@ export function DjinnAmbientSmoke({ intensity = 'low' }: { intensity?: 'low' | '
     }));
   }, [count, duration]);
 
-  if (!isActive || !shouldRender || !particlesActive) return null;
+  if (!isActive || !shouldRender || !djinn.particlesActive) return null;
 
   return (
     <Box
