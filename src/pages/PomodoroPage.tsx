@@ -173,12 +173,18 @@ export default function PomodoroPage() {
 
   async function tick() {
     try {
+      // Use timestamp-based calculation to prevent timer drift when browser tab is throttled
       const result = await invoke<any[]>("db_select", {
-        sql: "SELECT remaining_seconds FROM pomodoro_state WHERE id = 1",
+        sql: "SELECT start_timestamp, duration_seconds FROM pomodoro_state WHERE id = 1",
         params: [],
       });
 
-      const remaining = result[0].remaining_seconds - 1;
+      const startTimestamp = result[0].start_timestamp;
+      const durationSeconds = result[0].duration_seconds;
+
+      // Calculate actual elapsed time based on wall clock
+      const elapsedSeconds = Math.floor((Date.now() - startTimestamp) / 1000);
+      const remaining = Math.max(0, durationSeconds - elapsedSeconds);
 
       if (remaining <= 0) {
         await completeSession();
