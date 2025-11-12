@@ -11,6 +11,7 @@ import {
   Input,
   Spinner,
   useToast,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { format, parseISO } from "date-fns";
 import {
@@ -18,6 +19,7 @@ import {
   getSubjects,
 } from "../services/database";
 import { ActivityLogWithDetails, Subject } from "../types";
+import { getPreviewText } from "../utils/richTextUtils";
 
 export default function HistoryPage() {
   const [activities, setActivities] = useState<ActivityLogWithDetails[]>([]);
@@ -31,6 +33,13 @@ export default function HistoryPage() {
   const [endDate, setEndDate] = useState<string>("");
 
   const toast = useToast();
+
+  // Dark mode colors
+  const bgColor = useColorModeValue("white", "#1a1a1a");
+  const borderColor = useColorModeValue("gray.200", "#2d2d2d");
+  const itemBgColor = useColorModeValue("gray.50", "#252525");
+  const textColor = useColorModeValue("text.primary", "#ffffff");
+  const secondaryTextColor = useColorModeValue("text.secondary", "#b0b0b0");
 
   useEffect(() => {
     loadSubjects();
@@ -128,12 +137,12 @@ export default function HistoryPage() {
 
   return (
     <Box>
-      <Heading size="xl" color="text.primary" mb={8}>
+      <Heading size="xl" color={textColor} mb={8}>
         Activity History
       </Heading>
 
       {/* Filters */}
-      <Card mb={6}>
+      <Card mb={6} bg={bgColor}>
         <CardBody>
           <HStack spacing={4} wrap="wrap">
             <Box minW="200px">
@@ -208,12 +217,12 @@ export default function HistoryPage() {
           textAlign="center"
           py={16}
           px={4}
-          bg="white"
+          bg={bgColor}
           borderRadius="md"
           border="2px dashed"
-          borderColor="gray.200"
+          borderColor={borderColor}
         >
-          <Text fontSize="lg" color="text.tertiary">
+          <Text fontSize="lg" color={secondaryTextColor}>
             No activity found for the selected filters
           </Text>
         </Box>
@@ -222,19 +231,19 @@ export default function HistoryPage() {
           {dates.map((date) => (
             <Box key={date}>
               <HStack mb={3}>
-                <Text fontSize="lg" fontWeight="semibold" color="text.primary">
+                <Text fontSize="lg" fontWeight="semibold" color={textColor}>
                   📅 {format(parseISO(date), "MMMM dd, yyyy")}
                 </Text>
               </HStack>
 
-              <Card>
+              <Card bg={bgColor}>
                 <CardBody>
                   <VStack spacing={3} align="stretch">
                     {activitiesByDate[date].map((activity) => (
                       <HStack
                         key={activity.id}
                         p={3}
-                        bg="gray.50"
+                        bg={itemBgColor}
                         borderRadius="md"
                         align="start"
                       >
@@ -243,16 +252,22 @@ export default function HistoryPage() {
                         </Text>
                         <VStack align="start" spacing={1} flex="1">
                           <HStack>
-                            <Text fontWeight="semibold" color="text.primary">
+                            <Text fontWeight="semibold" color={textColor}>
                               {getActivityLabel(activity)}:
                             </Text>
                             <Text color="primary.500" fontWeight="semibold">
                               {activity.subject.name}
                             </Text>
                           </HStack>
-                          <Text color="text.secondary" fontSize="sm" noOfLines={2}>
-                            {activity.entry.study_notes}
-                          </Text>
+                          {(activity.entry as any).topics ? (
+                            <Text color={secondaryTextColor} fontSize="sm" noOfLines={2}>
+                              Topics: {(activity.entry as any).topics}
+                            </Text>
+                          ) : (
+                            <Text color={secondaryTextColor} fontSize="sm" noOfLines={2}>
+                              {getPreviewText(activity.entry.study_notes, 150)}
+                            </Text>
+                          )}
                         </VStack>
                       </HStack>
                     ))}

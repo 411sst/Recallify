@@ -818,3 +818,133 @@ export async function getEntryTags(entryId: number) {
     [entryId]
   );
 }
+
+// Daily Activity Tracking for Streaks
+export async function updateDailyActivity(date: string) {
+  // Calculate pomodoro minutes and count for the day
+  const pomodoroData = await dbSelect<any>(
+    `SELECT
+      COUNT(*) as pomodoro_count,
+      SUM(duration_minutes) as study_minutes
+     FROM pomodoro_sessions
+     WHERE session_type = 'work'
+       AND DATE(completed_at) = ?`,
+    [date]
+  );
+
+  // Count entries created on this day
+  const entryData = await dbSelect<any>(
+    `SELECT COUNT(*) as entry_count
+     FROM entries
+     WHERE DATE(study_date) = ?`,
+    [date]
+  );
+
+  // Get unique subjects studied
+  const subjectsData = await dbSelect<any>(
+    `SELECT DISTINCT s.name
+     FROM subjects s
+     INNER JOIN entries e ON s.id = e.subject_id
+     WHERE DATE(e.study_date) = ?`,
+    [date]
+  );
+
+  const studyMinutes = pomodoroData[0]?.study_minutes || 0;
+  const pomodoroCount = pomodoroData[0]?.pomodoro_count || 0;
+  const entryCount = entryData[0]?.entry_count || 0;
+  const subjectsStudied = subjectsData.map((s: any) => s.name).join(',');
+
+  // Insert or update daily activity
+  await dbExecute(
+    `INSERT INTO daily_activity (activity_date, study_minutes, pomodoro_count, entry_count, subjects_studied, updated_at)
+     VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+     ON CONFLICT(activity_date) DO UPDATE SET
+       study_minutes = ?,
+       pomodoro_count = ?,
+       entry_count = ?,
+       subjects_studied = ?,
+       updated_at = CURRENT_TIMESTAMP`,
+    [date, studyMinutes, pomodoroCount, entryCount, subjectsStudied, studyMinutes, pomodoroCount, entryCount, subjectsStudied]
+  );
+}
+
+export async function getDailyActivities(startDate: string, endDate: string) {
+  return await dbSelect<any>(
+    `SELECT * FROM daily_activity
+     WHERE activity_date BETWEEN ? AND ?
+     ORDER BY activity_date DESC`,
+    [startDate, endDate]
+  );
+}
+
+export async function calculateStreaks() {
+  // Get all activity dates in descending order
+  const activities = await dbSelect<any>(
+    `SELECT activity_date FROM daily_activity
+     WHERE study_minutes > 0 OR entry_count > 0
+     ORDER BY activity_date DESC`,
+    []
+  );
+
+  if (activities.length === 0) {
+    return {
+      currentStreak: 0,
+      longestStreak: 0,
+      totalActiveDays: 0,
+    };
+  }
+
+  const today = format(new Date(), 'yyyy-MM-dd');
+  let currentStreak = 0;
+  let longestStreak = 0;
+  let tempStreak = 1;
+  let previousDate: Date | null = null;
+
+  // Check if today or yesterday has activity for current streak
+  const latestActivityDate = activities[0].activity_date;
+  const yesterday = format(addDays(new Date(), -1), 'yyyy-MM-dd');
+
+  if (latestActivityDate === today || latestActivityDate === yesterday) {
+    currentStreak = 1;
+
+    // Count backwards from latest activity
+    for (let i = 1; i < activities.length; i++) {
+      const currentDate = parseISO(activities[i].activity_date);
+      const prevDate = parseISO(activities[i - 1].activity_date);
+
+      const diffDays = Math.round((prevDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        currentStreak++;
+      } else {
+        break;
+      }
+    }
+  }
+
+  // Calculate longest streak
+  for (let i = 0; i < activities.length; i++) {
+    const currentDate = parseISO(activities[i].activity_date);
+
+    if (previousDate) {
+      const diffDays = Math.round((previousDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        tempStreak++;
+        longestStreak = Math.max(longestStreak, tempStreak);
+      } else {
+        tempStreak = 1;
+      }
+    } else {
+      longestStreak = 1;
+    }
+
+    previousDate = currentDate;
+  }
+
+  return {
+    currentStreak,
+    longestStreak,
+    totalActiveDays: activities.length,
+  };
+}
