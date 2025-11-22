@@ -16,8 +16,6 @@ import {
   Tabs,
   TabList,
   Tab,
-  TabPanels,
-  TabPanel,
   Badge,
   Modal,
   ModalOverlay,

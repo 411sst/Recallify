@@ -22,6 +22,9 @@ import {
 } from "@chakra-ui/react";
 import { invoke } from "@tauri-apps/api/tauri";
 import { sendNotification } from "@tauri-apps/api/notification";
+import { format } from "date-fns";
+import { updateDailyActivity, calculateStreaks, checkAndRecordMilestone, markMilestoneShown } from "../services/database";
+import CelebrationModal from "../components/CelebrationModal";
 
 interface PomodoroState {
   session_type: "work" | "short_break" | "long_break";
@@ -54,6 +57,12 @@ export default function PomodoroPage() {
     onOpen: onSubjectSelectOpen,
     onClose: onSubjectSelectClose,
   } = useDisclosure();
+  const {
+    isOpen: isCelebrationOpen,
+    onOpen: onCelebrationOpen,
+    onClose: onCelebrationClose,
+  } = useDisclosure();
+  const [celebrationMilestone, setCelebrationMilestone] = useState<number | null>(null);
   const toast = useToast();
 
   // Dark mode colors
@@ -240,6 +249,21 @@ export default function PomodoroPage() {
       });
 
       const isWorkComplete = state.session_type === "work";
+
+      // Check for milestone celebration after work session
+      if (isWorkComplete) {
+        const today = format(new Date(), "yyyy-MM-dd");
+        await updateDailyActivity(today);
+        const streaks = await calculateStreaks();
+        const milestoneCheck = await checkAndRecordMilestone(streaks.currentStreak);
+
+        if (milestoneCheck && milestoneCheck.shouldCelebrate) {
+          // Show celebration modal
+          setCelebrationMilestone(milestoneCheck.milestone);
+          onCelebrationOpen();
+        }
+      }
+
       const title = isWorkComplete ? "🎉 Pomodoro Complete!" : "☕ Break Over!";
       const body = isWorkComplete ? "Time for a break!" : "Ready to focus?";
 
@@ -527,6 +551,19 @@ export default function PomodoroPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Milestone Celebration Modal */}
+      <CelebrationModal
+        isOpen={isCelebrationOpen}
+        milestone={celebrationMilestone}
+        onClose={async () => {
+          if (celebrationMilestone) {
+            await markMilestoneShown(celebrationMilestone);
+          }
+          setCelebrationMilestone(null);
+          onCelebrationClose();
+        }}
+      />
     </Box>
   );
 }

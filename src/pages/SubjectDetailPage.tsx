@@ -53,11 +53,16 @@ import {
   getSettings,
   linkTagsToEntry,
   getEntryTags,
+  updateDailyActivity,
+  calculateStreaks,
+  checkAndRecordMilestone,
+  markMilestoneShown,
 } from "../services/database";
 import { Subject, EntryWithDetails } from "../types";
 import { useRef } from "react";
 import SyllabusTab from "../components/SyllabusTab";
 import RichTextEditor from "../components/RichTextEditor";
+import CelebrationModal from "../components/CelebrationModal";
 import { getPreviewText } from "../utils/richTextUtils";
 
 export default function SubjectDetailPage() {
@@ -93,6 +98,12 @@ export default function SubjectDetailPage() {
     onOpen: onDeleteSubjectOpen,
     onClose: onDeleteSubjectClose,
   } = useDisclosure();
+  const {
+    isOpen: isCelebrationOpen,
+    onOpen: onCelebrationOpen,
+    onClose: onCelebrationClose,
+  } = useDisclosure();
+  const [celebrationMilestone, setCelebrationMilestone] = useState<number | null>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
 
   const toast = useToast();
@@ -227,6 +238,19 @@ export default function SubjectDetailPage() {
       } else {
         const newEntry = await createEntry(Number(id), studyDate, studyNotes, intervals, topics);
         entryId = newEntry.id;
+
+        // Check for milestone celebration after creating new entry
+        const today = format(new Date(), "yyyy-MM-dd");
+        await updateDailyActivity(today);
+        const streaks = await calculateStreaks();
+        const milestoneCheck = await checkAndRecordMilestone(streaks.currentStreak);
+
+        if (milestoneCheck && milestoneCheck.shouldCelebrate) {
+          // Show celebration modal
+          setCelebrationMilestone(milestoneCheck.milestone);
+          onCelebrationOpen();
+        }
+
         toast({
           title: "Entry created",
           status: "success",
@@ -818,6 +842,19 @@ export default function SubjectDetailPage() {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
+
+      {/* Milestone Celebration Modal */}
+      <CelebrationModal
+        isOpen={isCelebrationOpen}
+        milestone={celebrationMilestone}
+        onClose={async () => {
+          if (celebrationMilestone) {
+            await markMilestoneShown(celebrationMilestone);
+          }
+          setCelebrationMilestone(null);
+          onCelebrationClose();
+        }}
+      />
     </Box>
   );
 }
