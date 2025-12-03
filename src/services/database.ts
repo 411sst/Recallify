@@ -13,12 +13,42 @@ import {
 } from "../types";
 import { format, addDays, parseISO } from "date-fns";
 
+// Small helper to ensure the Tauri IPC bridge is ready before invoking commands
+function isTauriApiAvailable(): boolean {
+  const w = window as any;
+  return (
+    typeof w !== "undefined" &&
+    w.__TAURI__ &&
+    typeof w.__TAURI__.invoke === "function"
+  );
+}
+
+async function waitForTauriApi(timeoutMs = 10000): Promise<boolean> {
+  if (isTauriApiAvailable()) return true;
+  return await new Promise<boolean>((resolve) => {
+    const start = Date.now();
+    const id = setInterval(() => {
+      if (isTauriApiAvailable()) {
+        clearInterval(id);
+        resolve(true);
+      } else if (Date.now() - start > timeoutMs) {
+        clearInterval(id);
+        resolve(false);
+      }
+    }, 100);
+  });
+}
+
 // Database wrapper functions
 async function dbExecute(sql: string, params: any[] = []): Promise<{ lastInsertId: number; rowsAffected: number }> {
+  const ready = await waitForTauriApi();
+  if (!ready) throw new Error("Tauri IPC bridge not ready");
   return await invoke("db_execute", { sql, params });
 }
 
 async function dbSelect<T>(sql: string, params: any[] = []): Promise<T[]> {
+  const ready = await waitForTauriApi();
+  if (!ready) throw new Error("Tauri IPC bridge not ready");
   return await invoke("db_select", { sql, params });
 }
 

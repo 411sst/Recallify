@@ -31,3 +31,25 @@ src-tauri/WixTools
 *.db
 *.db-shm
 *.db-wal
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Tauri bundle artifacts
+src-tauri/target
+src-tauri/WixTools
+src-tauri/Cargo.lock
+
+# OS-specific
+Thumbs.db
+desktop.ini
+
+# IDE-specific
+*.swp
+*.swo
+*~
+.history/

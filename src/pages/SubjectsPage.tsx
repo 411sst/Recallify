@@ -32,6 +32,7 @@ export default function SubjectsPage() {
   const [subjects, setSubjects] = useState<SubjectWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [newSubjectName, setNewSubjectName] = useState("");
+  const [tauriReady, setTauriReady] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const navigate = useNavigate();
@@ -42,9 +43,40 @@ export default function SubjectsPage() {
   const emptyStateBg = useColorModeValue("white", "#1a1a1a");
   const emptyStateBorder = useColorModeValue("gray.200", "#333333");
 
+  // Wait for Tauri to be ready before loading anything
   useEffect(() => {
-    loadSubjects();
-  }, []);
+    const checkTauri = async () => {
+      const w = window as any;
+      if (w.__TAURI__ && typeof w.__TAURI__.invoke === "function") {
+        setTauriReady(true);
+        return;
+      }
+      // Wait for Tauri to initialize
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (w.__TAURI__ && typeof w.__TAURI__.invoke === "function") {
+          clearInterval(interval);
+          setTauriReady(true);
+        } else if (attempts > 100) {
+          clearInterval(interval);
+          toast({
+            title: "Failed to initialize",
+            description: "Tauri runtime not available",
+            status: "error",
+            duration: 5000,
+          });
+        }
+      }, 100);
+    };
+    checkTauri();
+  }, [toast]);
+
+  useEffect(() => {
+    if (tauriReady) {
+      loadSubjects();
+    }
+  }, [tauriReady]);
 
   async function loadSubjects() {
     try {
@@ -93,7 +125,7 @@ export default function SubjectsPage() {
     }
   }
 
-  if (loading) {
+  if (loading || !tauriReady) {
     return (
       <Box
         display="flex"
