@@ -799,6 +799,42 @@ export async function getAllSubjectsStudyTime(days: number = 7): Promise<any[]> 
   );
 }
 
+export async function getTodayPomodoroSummary(): Promise<{
+  totalPomodoros: number;
+  totalMinutes: number;
+  subjectsStudied: string[];
+}> {
+  const today = format(new Date(), "yyyy-MM-dd");
+
+  // Get today's pomodoro count and minutes
+  const result = await dbSelect<any>(
+    `SELECT
+      COUNT(*) as count,
+      SUM(duration_minutes) as total_minutes
+     FROM pomodoro_sessions
+     WHERE session_type = 'work'
+       AND DATE(completed_at) = ?`,
+    [today]
+  );
+
+  // Get subjects studied today
+  const subjects = await dbSelect<any>(
+    `SELECT DISTINCT s.name
+     FROM pomodoro_sessions ps
+     JOIN subjects s ON ps.subject_id = s.id
+     WHERE ps.session_type = 'work'
+       AND DATE(ps.completed_at) = ?
+     ORDER BY ps.completed_at DESC`,
+    [today]
+  );
+
+  return {
+    totalPomodoros: result[0]?.count || 0,
+    totalMinutes: result[0]?.total_minutes || 0,
+    subjectsStudied: subjects.map((s: any) => s.name),
+  };
+}
+
 // ============= TAGS =============
 
 export async function getAllTags() {

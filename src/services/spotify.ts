@@ -4,9 +4,11 @@ import { invoke } from "@tauri-apps/api/tauri";
 // Get credentials from: https://developer.spotify.com/dashboard
 const SPOTIFY_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || "";
 const SPOTIFY_CLIENT_SECRET = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET || "";
-// Spotify requires 127.0.0.1 (doesn't allow localhost), but Tauri works better with localhost
-// So we use 127.0.0.1 for Spotify OAuth, but the app runs on localhost
-const REDIRECT_URI = "http://127.0.0.1:1420/spotify-callback";
+// Use a hosted callback page for production, or localhost for dev
+// In production, users will copy the code manually from the callback page
+const REDIRECT_URI = import.meta.env.DEV 
+  ? "http://localhost:1420/spotify-callback"
+  : "https://recallify-spotify-callback.netlify.app/";
 
 // Scopes needed for playback and playlist access
 const SCOPES = [

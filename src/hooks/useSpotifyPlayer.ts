@@ -146,6 +146,12 @@ export function useSpotifyPlayer() {
     setIsInitializing(true);
 
     try {
+      const token = await getValidAccessToken();
+
+      if (!token) {
+        throw new Error("No valid Spotify token");
+      }
+
       // Check premium status
       const premium = await checkPremiumStatus();
       setIsPremium(premium);
@@ -162,10 +168,19 @@ export function useSpotifyPlayer() {
         return;
       }
 
-      const token = await getValidAccessToken();
-
-      if (!token) {
-        throw new Error("No valid Spotify token");
+      // Check if SDK is loaded
+      if (!window.Spotify) {
+        console.log("Waiting for Spotify SDK to load...");
+        // Wait up to 10 seconds for SDK to load
+        let attempts = 0;
+        while (!window.Spotify && attempts < 20) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+          attempts++;
+        }
+        
+        if (!window.Spotify) {
+          throw new Error("Spotify SDK failed to load. Please check your internet connection.");
+        }
       }
 
       const spotifyPlayer = new window.Spotify.Player({
@@ -267,20 +282,29 @@ export function useSpotifyPlayer() {
         }
       });
 
-      // Connect to the player
-      const connected = await spotifyPlayer.connect();
+      // Connect to the player with timeout
+      const connectPromise = spotifyPlayer.connect();
+      const timeoutPromise = new Promise<boolean>((_, reject) => 
+        setTimeout(() => reject(new Error("Connection timeout")), 15000)
+      );
+
+      const connected = await Promise.race([connectPromise, timeoutPromise]);
 
       if (connected) {
         setPlayer(spotifyPlayer);
         console.log("Successfully connected to Spotify!");
+      } else {
+        throw new Error("Failed to connect to Spotify player");
       }
     } catch (error) {
       console.error("Error initializing player:", error);
+      const errorMessage = error instanceof Error ? error.message : "Could not connect to Spotify";
       toast({
         title: "Connection Error",
-        description: "Could not connect to Spotify. Please try again.",
+        description: errorMessage + ". Please try logging out and back in.",
         status: "error",
-        duration: 3000,
+        duration: 5000,
+        isClosable: true,
       });
     } finally {
       setIsInitializing(false);
